@@ -4,37 +4,40 @@ import { useState } from 'react';
 
 export function Home() {
   const [variant, setVariant] = useState<DynamicIslandVariant>('default');
+  const [position, setPosition] = useState<'default' | 'fixed'>('fixed');
 
   const variants: DynamicIslandVariant[] = ['default', 'large', 'xLarge', 'ultra'];
 
   return (
     <div css={containerCss}>
       <h1>Dynamic Island</h1>
+      <div css={position === 'fixed' ? fixedDynamicIslandCss : undefined}>
+        <DynamicIsland variant={variant} />
+      </div>
+
       <div
         style={{
           position: 'fixed',
-          top: '20px',
-          left: '50%',
-          transform: 'translateX(-50%)',
+          bottom: '40px',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '10px',
         }}
       >
-        <DynamicIsland variant={variant} />
-      </div>
-      <div>
+        <button
+          onClick={() => setPosition(position === 'default' ? 'fixed' : 'default')}
+          css={buttonCss}
+          style={{ gridColumn: 'span 4' }}
+        >
+          {position === 'default' ? 'Fixed' : 'Default'}
+        </button>
+
         {variants.map(v => (
           <button
             key={v}
             onClick={() => setVariant(v)}
-            style={{
-              padding: '10px 20px',
-              fontSize: '16px',
-              borderRadius: '8px',
-              border: 'none',
-              background: 'black',
-              color: 'white',
-              cursor: 'pointer',
-              margin: '5px',
-            }}
+            css={buttonCss}
+            style={{ backgroundColor: v === variant ? '#333' : 'black' }}
           >
             {v}
           </button>
@@ -51,4 +54,22 @@ const containerCss = css({
   alignItems: 'center',
   height: '100vh',
   gap: '20px',
+});
+
+const fixedDynamicIslandCss = css({
+  position: 'fixed',
+  top: '20px',
+  width: '100%',
+  display: 'flex',
+  justifyContent: 'center',
+});
+
+const buttonCss = css({
+  padding: '10px 20px',
+  fontSize: '16px',
+  borderRadius: '8px',
+  border: 'none',
+  background: 'black',
+  color: 'white',
+  cursor: 'pointer',
 });

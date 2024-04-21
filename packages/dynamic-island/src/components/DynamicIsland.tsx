@@ -1,6 +1,6 @@
 import { css } from "@emotion/react";
 import { type FigmaSquircleParams, getSvgPath } from "figma-squircle";
-import { motion } from "framer-motion";
+import { motion, useWillChange } from "framer-motion";
 import { DynamicIslandVariant } from "..";
 
 const sizeMap: Record<DynamicIslandVariant, FigmaSquircleParams> = {
@@ -18,9 +18,11 @@ export type DynamicIslandProps = {
 export function DynamicIsland({ children, variant }: DynamicIslandProps) {
   const params = sizeMap[variant];
   const svgPath = getSvgPath(params);
-
+  const willChange = useWillChange();
+  console.log(svgPath);
   return (
     <motion.div
+      initial={false}
       animate={{
         width: params.width,
         height: params.height,
@@ -29,8 +31,10 @@ export function DynamicIsland({ children, variant }: DynamicIslandProps) {
       transition={{ stiffness: 400, damping: 30, type: "spring" }}
       css={containerCss}
       style={{
+        willChange,
         width: params.width,
         height: params.height,
+        borderRadius: params.cornerRadius,
         clipPath: `path("${svgPath}"`,
       }}
     >
