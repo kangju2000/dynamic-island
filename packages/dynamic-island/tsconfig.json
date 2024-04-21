@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "Bundler",
+    "module": "esnext",
+    "target": "ESNext",
+    "lib": ["es6", "dom", "es2017", "es2019", "es2021", "es2022"],
+    "sourceMap": true,
+    "allowJs": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "declaration": true,
+    "outDir": "./dist",
+    "jsx": "react-jsx",
+    "jsxImportSource": "@emotion/react",
+    "resolveJsonModule": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true
+  },
+  "include": ["src", "tsup.config.ts"]
+}

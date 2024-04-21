@@ -1,5 +1,5 @@
 {
-  "name": "@kangju2000/dynamic-island-web",
+  "name": "@kangju2000/web",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
+    "@kangju2000/dynamic-island": "workspace:^",
     "framer-motion": "^11.1.7",
     "prettier": "^3.2.5",
     "react": "^18.2.0",
