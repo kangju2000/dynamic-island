@@ -1,1 +1,6 @@
-export { DynamicIsland } from "./components/DynamicIsland";
+export {
+  DynamicIsland,
+  type DynamicIslandProps,
+} from "./components/DynamicIsland";
+
+export * from "./types";

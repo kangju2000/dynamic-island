@@ -78,6 +78,9 @@ importers:
       '@emotion/react':
         specifier: ^11.11.4
         version: 11.11.4(@types/react@18.2.79)(react@18.2.0)
+      figma-squircle:
+        specifier: ^0.3.1
+        version: 0.3.1
       framer-motion:
         specifier: ^10
         version: 10.18.0(react-dom@18.2.0)(react@18.2.0)
@@ -2213,6 +2216,10 @@ packages:
     dependencies:
       reusify: 1.0.4
     dev: true
+
+  /figma-squircle@0.3.1:
+    resolution: {integrity: sha512-cyb7fbNaJgM3XrMXRq/B4NPUILfbrSRHjqt+0/3OGBOejJKNLnFKTXSMSAjdqbw2bSo2Y2eCnYXvaRgshBnWQw==}
+    dev: false
 
   /file-entry-cache@6.0.1:
     resolution: {integrity: sha512-7Gps/XWymbLk2QLYK4NzpMOrYjMhdIxXuIvy2QBsLE6ljuodKvdkWs/cpyJJ3CVIVpH0Oi1Hvg1ovbMzLdFBBg==}
