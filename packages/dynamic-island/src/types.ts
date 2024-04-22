@@ -1,6 +1,6 @@
 export type DynamicIslandVariant =
   | "default"
-  // | "separeted"
-  | "large"
-  | "xLarge"
-  | "ultra";
+  | "compact"
+  | "minimal"
+  | "half"
+  | "extended";

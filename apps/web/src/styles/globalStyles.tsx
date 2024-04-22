@@ -9,6 +9,7 @@ export function GlobalStyles() {
           width: 100%;
           height: 100%;
           -ms-overflow-style: none;
+          -webkit-tap-highlight-color: transparent;
         }
         #root {
           width: 100%;

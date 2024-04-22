@@ -6,7 +6,7 @@ export function Home() {
   const [variant, setVariant] = useState<DynamicIslandVariant>('default');
   const [position, setPosition] = useState<'default' | 'fixed'>('fixed');
 
-  const variants: DynamicIslandVariant[] = ['default', 'large', 'xLarge', 'ultra'];
+  const variants: DynamicIslandVariant[] = ['default', 'compact', 'minimal', 'half', 'extended'];
 
   return (
     <div css={containerCss}>
@@ -27,7 +27,7 @@ export function Home() {
         <button
           onClick={() => setPosition(position === 'default' ? 'fixed' : 'default')}
           css={buttonCss}
-          style={{ gridColumn: 'span 4' }}
+          style={{ gridColumn: `span ${variants.length}` }}
         >
           {position === 'default' ? 'Fixed' : 'Default'}
         </button>
