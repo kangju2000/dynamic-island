@@ -1,46 +1,92 @@
 import { css } from "@emotion/react";
-import { type FigmaSquircleParams, getSvgPath } from "figma-squircle";
-import { cubicBezier, motion, useWillChange } from "framer-motion";
+import { getSvgPath } from "figma-squircle";
+import {
+  AnimatePresence,
+  cubicBezier,
+  motion,
+  useWillChange,
+} from "framer-motion";
+import { useEffect, useState } from "react";
 import { type DynamicIslandVariant } from "..";
-
-const sizeMap: Record<DynamicIslandVariant, FigmaSquircleParams> = {
-  default: {
-    width: 122,
-    height: 36.67,
-    cornerRadius: 32,
-    cornerSmoothing: 0.6,
-  },
-  compact: {
-    width: 155,
-    height: 36.67,
-    cornerRadius: 32,
-    cornerSmoothing: 0.6,
-  },
-  minimal: {
-    width: 155,
-    height: 36.67,
-    cornerRadius: 32,
-    cornerSmoothing: 0.6,
-  },
-  half: { width: 366, height: 82, cornerRadius: 50, cornerSmoothing: 0 },
-  extended: { width: 366, height: 200, cornerRadius: 48, cornerSmoothing: 0.6 },
-};
+import { sizeMap } from "../constant";
+import { usePrevious } from "../hooks/usePrevious";
 
 export type DynamicIslandProps = {
   variant: DynamicIslandVariant;
-  children?: React.ReactNode;
+  /**
+   * The minimal presentation in the Dynamic Island.
+   */
   minimal?: React.ReactNode;
+  /**
+   * The compact leading presentation in the Dynamic Island.
+   */
+  compactLeading?: React.ReactNode;
+  /**
+   * The compact trailing presentation in the Dynamic Island.
+   */
+  compactTrailing?: React.ReactNode;
+  /**
+   * The expanded presentation in the Dynamic Island.
+   */
+  expanded?: React.ReactNode;
 };
 
 export function DynamicIsland({
-  children,
-  variant,
+  variant: _variant,
   minimal,
+  compactLeading,
+  compactTrailing,
+  expanded,
 }: DynamicIslandProps) {
+  const willChange = useWillChange();
+  const previousVariant = usePrevious(_variant);
+  const [variant, setVariant] = useState<DynamicIslandVariant>(_variant);
   const params = sizeMap[variant];
   const islandPath = getSvgPath(params);
   const minimalPath = getSvgPath({ ...params, width: 45, height: 36.67 });
-  const willChange = useWillChange();
+
+  const renderContent = () => {
+    switch (variant) {
+      case "compact":
+        return (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              width: sizeMap.compact.width,
+              display: "flex",
+              justifyContent: "center",
+              wordBreak: "break-word",
+            }}
+          >
+            {compactLeading}
+            <div style={{ minWidth: sizeMap.default.width }} />
+            {compactTrailing}
+          </motion.div>
+        );
+      case "expanded":
+        return (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            {expanded}
+          </motion.div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  useEffect(() => {
+    if (previousVariant !== "default" && _variant !== "default") {
+      setVariant("default");
+    } else {
+      setVariant(_variant);
+    }
+  }, [_variant]);
 
   return (
     <div css={wrapperCss}>
@@ -53,14 +99,8 @@ export function DynamicIsland({
           clipPath: `path("${islandPath}")`,
         }}
         variants={{
-          default: (rest) => ({
-            ...rest,
-            // transition: { stiffness: 400, damping: 30, type: "spring" },
-          }),
-          compact: (rest) => ({
-            ...rest,
-            // transition: { stiffness: 400, damping: 30, type: "spring" },
-          }),
+          default: (rest) => ({ ...rest }),
+          compact: (rest) => ({ ...rest }),
           minimal: (rest) => ({
             ...rest,
             x: -36.67 / 2,
@@ -71,12 +111,8 @@ export function DynamicIsland({
               damping: 30,
             },
           }),
-          half: (rest) => ({
-            ...rest,
-            transition: { stiffness: 400, damping: 30, type: "spring" },
-          }),
         }}
-        {...(variant !== "half" && variant !== "extended"
+        {...(variant === "default"
           ? {
               whileTap: {
                 scale: 1.1,
@@ -89,6 +125,9 @@ export function DynamicIsland({
               },
             }
           : {})}
+        onAnimationComplete={() => {
+          if (variant !== _variant) setVariant(_variant);
+        }}
         css={islandCss}
         style={{
           willChange,
@@ -98,9 +137,9 @@ export function DynamicIsland({
           clipPath: `path("${islandPath}")`,
         }}
       >
-        {children}
+        <AnimatePresence>{renderContent()}</AnimatePresence>
       </motion.div>
-      <svg width="120" height="72" css={svgCss}>
+      <svg width="120" height="72" css={splitEffectCss}>
         <defs>
           <filter
             id="split-effect"
@@ -119,10 +158,9 @@ export function DynamicIsland({
                   stdDeviation: [null, 10, 0],
                   transition: { duration: 0.4 },
                 },
-                half: { stdDeviation: 0, transition: { duration: 0.1 } },
               }}
               result="blur"
-            ></motion.feGaussianBlur>
+            />
             <feColorMatrix
               in="blur"
               type="matrix"
@@ -137,22 +175,20 @@ export function DynamicIsland({
         <g filter="url(#split-effect)">
           <circle cx="36" cy="36" r="18" fill="black" />
           <motion.rect
-            initial="default"
-            animate={variant}
-            variants={{
-              default: { x: 0, transition: { duration: 0.3 } },
-              compact: { x: 0, transition: { duration: 0.3 } },
-              minimal: {
-                x: 50,
-                transition: {
-                  stiffness: 300,
-                  mass: 0.1,
-                  type: "spring",
-                  damping: 30,
-                },
-              },
-              half: { x: 0, transition: { duration: 0.3 } },
-            }}
+            initial={false}
+            animate={
+              variant === "minimal"
+                ? {
+                    x: 50,
+                    transition: {
+                      stiffness: 300,
+                      mass: 0.1,
+                      type: "spring",
+                      damping: 30,
+                    },
+                  }
+                : { x: 0, transition: { duration: 0.3 } }
+            }
             x="18"
             y="18"
             width="40"
@@ -164,23 +200,18 @@ export function DynamicIsland({
       </svg>
 
       <motion.div
-        initial={variant}
-        animate={variant}
-        custom={{
-          clipPath: `path("${minimalPath}")`,
-        }}
-        variants={{
-          default: { opacity: 0, scale: 0.5, filter: "blur(4px)" },
-          compact: { opacity: 0, scale: 0.5, filter: "blur(4px)" },
-          minimal: {
-            opacity: 1,
-            x: 36.67,
-            scale: 1,
-            filter: "blur(0px)",
-            transition: { duration: 0.3 },
-          },
-          half: { opacity: 0, scale: 0.5, filter: "blur(4px)" },
-        }}
+        initial={false}
+        animate={
+          variant === "minimal"
+            ? {
+                opacity: 1,
+                x: 36.67,
+                scale: 1,
+                filter: "blur(0px)",
+                transition: { duration: 0.3 },
+              }
+            : { opacity: 0, scale: 0.5, filter: "blur(4px)" }
+        }
         css={minimalIslandCss}
         style={{
           willChange,
@@ -205,7 +236,7 @@ const islandCss = css({
   cursor: "pointer",
 });
 
-const svgCss = css({
+const splitEffectCss = css({
   position: "absolute",
   right: "-45px",
   top: "50%",
@@ -218,5 +249,6 @@ const minimalIslandCss = css({
   top: 0,
   right: 0,
   zIndex: 9999,
-  cursor: "pointer",
+  backgroundColor: "#000000",
+  overflow: "hidden",
 });

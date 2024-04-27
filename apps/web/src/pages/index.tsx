@@ -1,40 +1,26 @@
 import { css } from '@emotion/react';
-import { DynamicIsland, DynamicIslandVariant } from '@kangju2000/dynamic-island';
+import { DynamicIsland, DynamicIslandVariant, DynamicIslandMode } from '@kangju2000/dynamic-island';
 import { useState } from 'react';
 
 export function Home() {
   const [variant, setVariant] = useState<DynamicIslandVariant>('default');
-  const [position, setPosition] = useState<'default' | 'fixed'>('fixed');
-
-  const variants: DynamicIslandVariant[] = ['default', 'compact', 'minimal', 'half', 'extended'];
-
   return (
     <div css={containerCss}>
       <h1>Dynamic Island</h1>
-      <div css={position === 'fixed' ? fixedDynamicIslandCss : undefined}>
-        <DynamicIsland variant={variant} />
+      <div css={fixedDynamicIslandCss}>
+        <DynamicIsland
+          variant={variant}
+          compactLeading={<div>CompactLeading</div>}
+          compactTrailing={<div>CompactTrailing</div>}
+          expanded={<div>Expanded</div>}
+          minimal={<div>Minimal</div>}
+        />
       </div>
 
-      <div
-        style={{
-          position: 'fixed',
-          bottom: '40px',
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '10px',
-        }}
-      >
-        <button
-          onClick={() => setPosition(position === 'default' ? 'fixed' : 'default')}
-          css={buttonCss}
-          style={{ gridColumn: `span ${variants.length}` }}
-        >
-          {position === 'default' ? 'Fixed' : 'Default'}
-        </button>
-
-        {variants.map(v => (
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+        {Object.values(DynamicIslandMode).map((v, index) => (
           <button
-            key={v}
+            key={index}
             onClick={() => setVariant(v)}
             css={buttonCss}
             style={{ backgroundColor: v === variant ? '#333' : 'black' }}
