@@ -1,8 +1,7 @@
 import { css } from "@emotion/react";
 import { type FigmaSquircleParams, getSvgPath } from "figma-squircle";
 import { cubicBezier, motion, useWillChange } from "framer-motion";
-import { useState } from "react";
-import { DynamicIslandVariant } from "..";
+import { type DynamicIslandVariant } from "..";
 
 const sizeMap: Record<DynamicIslandVariant, FigmaSquircleParams> = {
   default: {
@@ -101,16 +100,7 @@ export function DynamicIsland({
       >
         {children}
       </motion.div>
-      <svg
-        width="120"
-        height="72"
-        style={{
-          position: "absolute",
-          right: "-45px",
-          top: "50%",
-          transform: "translateY(-50%)",
-        }}
-      >
+      <svg width="120" height="72" css={svgCss}>
         <defs>
           <filter
             id="split-effect"
@@ -141,7 +131,7 @@ export function DynamicIsland({
                       0 0 1 0 0 
                       0 0 0 25 -10"
               result="matrix"
-            ></feColorMatrix>
+            />
           </filter>
         </defs>
         <g filter="url(#split-effect)">
@@ -212,17 +202,21 @@ const wrapperCss = css({
 
 const islandCss = css({
   backgroundColor: "#000000",
-  zIndex: 9999,
-  userSelect: "none",
   cursor: "pointer",
+});
+
+const svgCss = css({
+  position: "absolute",
+  right: "-45px",
+  top: "50%",
+  transform: "translateY(-50%)",
+  zIndex: -1,
 });
 
 const minimalIslandCss = css({
   position: "absolute",
   top: 0,
   right: 0,
-  // backgroundColor: "#000000",
   zIndex: 9999,
-  userSelect: "none",
   cursor: "pointer",
 });
