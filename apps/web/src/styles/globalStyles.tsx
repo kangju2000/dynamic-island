@@ -4,6 +4,11 @@ export function GlobalStyles() {
   return (
     <Global
       styles={css`
+        @font-face {
+          font-family: 'SF Pro';
+          src: url(./fonts/SF-Pro-Display-Regular.otf) format('opentype');
+        }
+
         html,
         body {
           width: 100%;
@@ -23,6 +28,7 @@ export function GlobalStyles() {
           padding: 0;
           border: none;
           outline: none;
+          font-family: 'SF Pro', sans-serif;
         }
         ::-webkit-scrollbar {
           display: none;
