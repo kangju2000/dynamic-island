@@ -1,7 +1,7 @@
-import { css } from "@emotion/react";
-import { getSvgPath } from "figma-squircle";
-import { motion } from "framer-motion";
-import { sizeMap } from "../constant";
+import { css } from '@emotion/react';
+import { getSvgPath } from 'figma-squircle';
+import { motion } from 'framer-motion';
+import { sizeMap } from '../constant';
 
 type ExpandIslandProps = {
   children: React.ReactNode;
@@ -33,7 +33,7 @@ export function ExpandedIsland({ children }: ExpandIslandProps) {
 }
 
 const expandedIslandCss = css({
-  position: "relative",
-  backgroundColor: "#000",
-  overflow: "hidden",
+  position: 'relative',
+  backgroundColor: '#000',
+  overflow: 'hidden',
 });

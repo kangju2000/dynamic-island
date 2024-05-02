@@ -1,13 +1,13 @@
-import { css } from "@emotion/react";
-import { getSvgPath } from "figma-squircle";
-import { HTMLMotionProps } from "framer-motion";
-import { motion } from "framer-motion";
-import { sizeMap } from "../constant";
+import { css } from '@emotion/react';
+import { getSvgPath } from 'figma-squircle';
+import { HTMLMotionProps } from 'framer-motion';
+import { motion } from 'framer-motion';
+import { sizeMap } from '../constant';
 
-type NotchProps = HTMLMotionProps<"div">;
+type NotchProps = HTMLMotionProps<'div'>;
 
 export function Notch(props: NotchProps) {
-  const size = sizeMap["default"];
+  const size = sizeMap['default'];
   const notchPath = getSvgPath(size);
   const { style, ...restProps } = props;
 
@@ -27,5 +27,5 @@ export function Notch(props: NotchProps) {
 }
 
 const notchCss = css({
-  backgroundColor: "#000",
+  backgroundColor: '#000',
 });

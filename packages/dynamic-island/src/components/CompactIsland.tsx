@@ -1,7 +1,7 @@
-import { css } from "@emotion/react";
-import { getSvgPath } from "figma-squircle";
-import { motion } from "framer-motion";
-import { sizeMap } from "../constant";
+import { css } from '@emotion/react';
+import { getSvgPath } from 'figma-squircle';
+import { motion } from 'framer-motion';
+import { sizeMap } from '../constant';
 
 type CompactIslandProps = {
   leading?: React.ReactNode;
@@ -32,7 +32,7 @@ export function CompactIsland({ leading, trailing }: CompactIslandProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        style={{ width: "100%", maxWidth: 62.33, height: 36.67 }}
+        style={{ width: '100%', maxWidth: 62.33, height: 36.67 }}
       >
         {leading}
       </motion.div>
@@ -40,7 +40,7 @@ export function CompactIsland({ leading, trailing }: CompactIslandProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        style={{ width: "100%", maxWidth: 62.33, height: 36.67 }}
+        style={{ width: '100%', maxWidth: 62.33, height: 36.67 }}
       >
         {trailing}
       </motion.div>
@@ -48,9 +48,9 @@ export function CompactIsland({ leading, trailing }: CompactIslandProps) {
   );
 }
 const compactIslandCss = css({
-  position: "relative",
-  display: "flex",
-  justifyContent: "space-between",
-  backgroundColor: "#000",
-  overflow: "hidden",
+  position: 'relative',
+  display: 'flex',
+  justifyContent: 'space-between',
+  backgroundColor: '#000',
+  overflow: 'hidden',
 });

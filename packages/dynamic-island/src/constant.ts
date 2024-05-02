@@ -1,5 +1,5 @@
-import { type FigmaSquircleParams } from "figma-squircle";
-import { type DynamicIslandVariant } from "./types";
+import { type FigmaSquircleParams } from 'figma-squircle';
+import { type DynamicIslandVariant } from './types';
 
 export const sizeMap: Record<DynamicIslandVariant, FigmaSquircleParams> = {
   default: {
@@ -15,7 +15,7 @@ export const sizeMap: Record<DynamicIslandVariant, FigmaSquircleParams> = {
     cornerSmoothing: 0.6,
   },
   minimal: {
-    width: 155,
+    width: 45,
     height: 36.67,
     cornerRadius: 32,
     cornerSmoothing: 0.6,
