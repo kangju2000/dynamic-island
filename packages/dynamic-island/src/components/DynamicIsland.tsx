@@ -1,10 +1,12 @@
 import { css } from '@emotion/react';
 import { AnimatePresence } from 'framer-motion';
+import { Fragment } from 'react';
 import { type DynamicIslandVariant } from '..';
-import { CompactIsland } from './CompactIsland';
-import { ExpandedIsland } from './ExpandedIsland';
-import { MinimalIsland } from './MinimalIsland';
-import { Notch } from './Notch';
+import { CompactIsland } from './compound/CompactIsland';
+import { CustomIsland } from './compound/CustomIsland';
+import { ExpandedIsland } from './compound/ExpandedIsland';
+import { MinimalIsland } from './compound/MinimalIsland';
+import { Notch } from './compound/Notch';
 
 export type DynamicIslandProps = {
   variant: DynamicIslandVariant;
@@ -13,28 +15,29 @@ export type DynamicIslandProps = {
    */
   minimal?: React.ReactNode;
   /**
-   * The compact leading presentation in the Dynamic Island.
+   * The compact presentation in the Dynamic Island.
    */
-  compactLeading?: React.ReactNode;
-  /**
-   * The compact trailing presentation in the Dynamic Island.
-   */
-  compactTrailing?: React.ReactNode;
+  compact?: React.ReactNode;
   /**
    * The expanded presentation in the Dynamic Island.
    */
   expanded?: React.ReactNode;
-  children?: React.ReactNode;
-};
+  /**
+   * The custom presentation in the Dynamic Island.
+   */
+  custom?: React.ReactNode;
+  notchProps?: React.ComponentProps<typeof Notch>;
+} & React.ComponentProps<'div'>;
 
-export function DynamicIsland({ variant, minimal, compactLeading, compactTrailing, expanded }: DynamicIslandProps) {
+function Root({ variant, minimal, compact, expanded, custom, notchProps, ...props }: DynamicIslandProps) {
   return (
-    <div css={wrapperCss}>
-      <Notch css={notchCss} />
+    <div css={wrapperCss} {...props}>
+      <Notch css={notchCss} {...notchProps} />
       <AnimatePresence mode="wait">
-        {variant === 'compact' && <CompactIsland key="compact" leading={compactLeading} trailing={compactTrailing} />}
-        {variant === 'expanded' && <ExpandedIsland key="expanded">{expanded}</ExpandedIsland>}
-        {/* {variant === 'minimal' && <MinimalIsland>{minimal}</MinimalIsland>} */}
+        {variant === 'compact' && <Fragment key="compact">{compact}</Fragment>}
+        {variant === 'expanded' && <Fragment key="expanded">{expanded}</Fragment>}
+        {variant === 'custom' && <Fragment key="custom">{custom}</Fragment>}
+        {variant === 'minimal' && <Fragment key="minimal">{minimal}</Fragment>}
       </AnimatePresence>
     </div>
   );
@@ -51,3 +54,15 @@ const notchCss = css({
   transform: 'translateX(-50%)',
   zIndex: 9999,
 });
+
+export const DynamicIsland = Object.assign(
+  Root,
+  {},
+  {
+    Notch,
+    Compact: CompactIsland,
+    Expanded: ExpandedIsland,
+    Minimal: MinimalIsland,
+    Custom: CustomIsland,
+  }
+);

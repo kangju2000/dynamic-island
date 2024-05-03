@@ -1,5 +1,5 @@
 import { css } from '@emotion/react';
-import { DynamicIsland, DynamicIslandVariant, DynamicIslandMode } from '@kangju2000/dynamic-island';
+import { DynamicIsland, type DynamicIslandVariant, DynamicIslandMode } from '@kangju2000/dynamic-island';
 import { useState } from 'react';
 
 export function Home() {
@@ -10,10 +10,19 @@ export function Home() {
       <div css={fixedDynamicIslandCss}>
         <DynamicIsland
           variant={variant}
-          compactLeading={<div>CompactLeading</div>}
-          compactTrailing={<div>CompactTrailing</div>}
-          expanded={<div>Expanded</div>}
-          minimal={<div>Minimal</div>}
+          expanded={<DynamicIsland.Expanded>expanded</DynamicIsland.Expanded>}
+          minimal={<DynamicIsland.Minimal>minimal</DynamicIsland.Minimal>}
+          compact={<DynamicIsland.Compact leading={'leading'} trailing={'trailing'} />}
+          custom={
+            <DynamicIsland.Custom
+              squircle={{
+                width: 366,
+                height: 82,
+                cornerRadius: 50,
+                cornerSmoothing: 0,
+              }}
+            ></DynamicIsland.Custom>
+          }
         />
       </div>
 

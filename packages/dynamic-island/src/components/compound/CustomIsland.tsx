@@ -1,8 +1,8 @@
 import { css } from '@emotion/react';
 import { getSvgPath } from 'figma-squircle';
 import { type HTMLMotionProps, motion } from 'framer-motion';
-import { squircleVariant } from '../constant';
-import type { Squircle } from '../types';
+import { squircleVariant } from '../../constant';
+import type { Squircle } from '../../types';
 
 type CustomIsland = {
   squircle?: Squircle;
