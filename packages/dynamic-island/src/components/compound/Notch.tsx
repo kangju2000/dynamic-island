@@ -2,11 +2,12 @@ import { css } from '@emotion/react';
 import { getSvgPath } from 'figma-squircle';
 import { HTMLMotionProps } from 'framer-motion';
 import { motion } from 'framer-motion';
+import { forwardRef } from 'react';
 import { squircleVariant } from '../../constant';
 
 type NotchProps = HTMLMotionProps<'div'>;
 
-export function Notch(props: NotchProps) {
+export const Notch = forwardRef<HTMLDivElement, NotchProps>(function Notch(props) {
   const size = squircleVariant['default'];
   const notchPath = getSvgPath(size);
   const { style, ...restProps } = props;
@@ -24,7 +25,7 @@ export function Notch(props: NotchProps) {
       {...restProps}
     />
   );
-}
+});
 
 const notchCss = css({
   backgroundColor: '#000',
