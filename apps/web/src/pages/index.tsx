@@ -8,15 +8,13 @@ export function Home() {
 
   return (
     <div css={containerCss}>
-      <div css={fixedDynamicIslandCss}>
-        <DynamicIsland
-          variant={variant}
-          expanded={<DynamicIsland.Expanded>expanded</DynamicIsland.Expanded>}
-          minimal={<DynamicIsland.Minimal>minimal</DynamicIsland.Minimal>}
-          compact={<DynamicIsland.Compact leading={'leading'} trailing={'trailing'} />}
-          custom={<PhoneCall />}
-        />
-      </div>
+      <DynamicIsland
+        variant={variant}
+        expanded={<DynamicIsland.Expanded>expanded</DynamicIsland.Expanded>}
+        minimal={<DynamicIsland.Minimal>minimal</DynamicIsland.Minimal>}
+        compact={<DynamicIsland.Compact leading={'leading'} trailing={'trailing'} />}
+        custom={<PhoneCall />}
+      />
 
       <h1>Dynamic Island</h1>
 
@@ -36,7 +34,7 @@ export function Home() {
           <h3>Dynamic Island Mode</h3>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', alignContent: 'center' }}>
             {Object.values(DynamicIslandMode).map((v, index) => {
-              if (v === 'custom') {
+              if (v === 'custom' || v === 'minimal') {
                 return null;
               }
 
@@ -65,14 +63,6 @@ const containerCss = css({
   alignItems: 'center',
   height: '100vh',
   gap: '60px',
-});
-
-const fixedDynamicIslandCss = css({
-  position: 'fixed',
-  top: '20px',
-  width: '100%',
-  display: 'flex',
-  justifyContent: 'center',
 });
 
 const buttonCss = css({

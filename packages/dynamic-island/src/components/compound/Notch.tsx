@@ -7,13 +7,14 @@ import { squircleVariant } from '../../constant';
 
 type NotchProps = HTMLMotionProps<'div'>;
 
-export const Notch = forwardRef<HTMLDivElement, NotchProps>(function Notch(props) {
+export const Notch = forwardRef<HTMLDivElement, NotchProps>(function Notch(props, ref) {
   const size = squircleVariant['default'];
   const notchPath = getSvgPath(size);
   const { style, ...restProps } = props;
 
   return (
     <motion.div
+      ref={ref}
       css={notchCss}
       style={{
         width: size.width,
@@ -29,4 +30,5 @@ export const Notch = forwardRef<HTMLDivElement, NotchProps>(function Notch(props
 
 const notchCss = css({
   backgroundColor: '#000',
+  pointerEvents: 'none',
 });

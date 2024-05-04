@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 import { AnimatePresence } from 'framer-motion';
 import { Fragment } from 'react';
-import { type DynamicIslandVariant } from '..';
+import { squircleVariant, type DynamicIslandVariant } from '..';
 import { CompactIsland } from './compound/CompactIsland';
 import { CustomIsland } from './compound/CustomIsland';
 import { ExpandedIsland } from './compound/ExpandedIsland';
@@ -26,26 +26,39 @@ export type DynamicIslandProps = {
    * The custom presentation in the Dynamic Island.
    */
   custom?: React.ReactNode;
-  notchProps?: React.ComponentProps<typeof Notch>;
+  /**
+   * Fixed position of the Dynamic Island.
+   * @default true
+   */
+  fixed?: boolean;
 } & React.ComponentProps<'div'>;
 
-function Root({ variant, minimal, compact, expanded, custom, notchProps, ...props }: DynamicIslandProps) {
+function Root({ variant, minimal, compact, expanded, custom, fixed = true, ...props }: DynamicIslandProps) {
   return (
-    <div css={wrapperCss} {...props}>
-      <Notch css={notchCss} {...notchProps} />
+    <div css={fixed ? fixedCss : relativeCss} {...props}>
+      <Notch css={notchCss} />
       <AnimatePresence mode="wait">
         {variant === 'compact' && <Fragment key="compact">{compact}</Fragment>}
         {variant === 'expanded' && <Fragment key="expanded">{expanded}</Fragment>}
         {variant === 'custom' && <Fragment key="custom">{custom}</Fragment>}
         {variant === 'minimal' && <Fragment key="minimal">{minimal}</Fragment>}
       </AnimatePresence>
+      {!fixed && variant === 'default' && <div style={{ height: squircleVariant.default.height }} />}
     </div>
   );
 }
 
-const wrapperCss = css({
+const relativeCss = css({
   position: 'relative',
-  width: 'max-content',
+  display: 'flex',
+  justifyContent: 'center',
+});
+
+const fixedCss = css({
+  position: 'fixed',
+  top: '20px',
+  display: 'flex',
+  justifyContent: 'center',
 });
 
 const notchCss = css({

@@ -1,13 +1,15 @@
 import { css } from '@emotion/react';
 import { getSvgPath } from 'figma-squircle';
-import { motion } from 'framer-motion';
+import { HTMLMotionProps, motion, useWillChange } from 'framer-motion';
 import { squircleVariant } from '../../constant';
 
 type ExpandIslandProps = {
   children: React.ReactNode;
-};
+} & HTMLMotionProps<'div'>;
 
-export function ExpandedIsland({ children }: ExpandIslandProps) {
+export function ExpandedIsland({ children, ...props }: ExpandIslandProps) {
+  const willChange = useWillChange();
+
   return (
     <motion.div
       initial={{
@@ -26,6 +28,8 @@ export function ExpandedIsland({ children }: ExpandIslandProps) {
         clipPath: `path("${getSvgPath(squircleVariant.default)}")`,
       }}
       css={expandedIslandCss}
+      style={{ willChange }}
+      {...props}
     >
       {children}
     </motion.div>
