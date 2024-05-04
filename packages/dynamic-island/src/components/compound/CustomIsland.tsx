@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 import { getSvgPath } from 'figma-squircle';
-import { type HTMLMotionProps, motion, cubicBezier, useWillChange } from 'framer-motion';
+import { type HTMLMotionProps, motion, useWillChange } from 'framer-motion';
 import { squircleVariant } from '../../constant';
 import type { Squircle } from '../../types';
 
@@ -9,7 +9,7 @@ type CustomIsland = {
   children?: React.ReactNode;
 } & HTMLMotionProps<'div'>;
 
-export function CustomIsland({ squircle, children, style, ...props }: CustomIsland) {
+export function CustomIsland({ squircle, children, ...props }: CustomIsland) {
   const willChange = useWillChange();
   const customSquircle = {
     width: squircle?.width ?? squircleVariant.default.width,
@@ -19,72 +19,39 @@ export function CustomIsland({ squircle, children, style, ...props }: CustomIsla
   };
 
   return (
-    <div css={wrapperCss} style={{ width: customSquircle.width, height: customSquircle.height }}>
-      <motion.div
-        initial={{
-          width: squircleVariant.default.width,
-          height: squircleVariant.default.height,
-          clipPath: `path("${getSvgPath(squircleVariant.default)}")`,
-        }}
-        animate={{
-          width: customSquircle.width,
-          height: customSquircle.height,
-          clipPath: `path("${getSvgPath(customSquircle)}")`,
-        }}
-        exit={{
-          width: squircleVariant.default.width,
-          height: squircleVariant.default.height,
-          clipPath: `path("${getSvgPath(squircleVariant.default)}")`,
-        }}
-        css={customIslandCss}
-        style={{ willChange }}
-      >
-        <motion.div
-          initial={{
-            opacity: 0,
-            scale: 0.8,
-            filter: 'blur(10px)',
-            rotateX: 45,
-          }}
-          animate={{
-            opacity: 1,
-            scale: 1,
-            filter: 'blur(0px)',
-            rotateX: 0,
-            transition: { delay: 0.08 },
-          }}
-          exit={{
-            opacity: 0,
-            scale: 0.8,
-            filter: 'blur(10px)',
-            rotateX: 45,
-            transition: { delay: 0 },
-          }}
-          transition={{ duration: 4 }}
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: customSquircle.width,
-            height: customSquircle.height,
-            ...style,
-          }}
-          {...props}
-        >
-          {children}
-        </motion.div>
-      </motion.div>
-    </div>
+    <motion.div
+      initial={{
+        width: squircleVariant.default.width,
+        height: squircleVariant.default.height,
+        clipPath: `path("${getSvgPath(squircleVariant.default)}")`,
+      }}
+      animate={{
+        width: customSquircle.width,
+        height: customSquircle.height,
+        clipPath: `path("${getSvgPath(customSquircle)}")`,
+      }}
+      exit={{
+        width: squircleVariant.default.width,
+        height: squircleVariant.default.height,
+        clipPath: `path("${getSvgPath(squircleVariant.default)}")`,
+      }}
+      transition={{
+        type: 'spring',
+        stiffness: 100,
+        damping: 12,
+        mass: 0.5,
+      }}
+      css={customIslandCss}
+      style={{ willChange }}
+      {...props}
+    >
+      {children}
+    </motion.div>
   );
 }
 
-const wrapperCss = css({
-  position: 'relative',
-  display: 'flex',
-  justifyContent: 'center',
-});
-
 const customIslandCss = css({
+  position: 'relative',
   backgroundColor: '#000',
   overflow: 'hidden',
 });

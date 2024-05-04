@@ -45,6 +45,7 @@ function Root({ variant, minimal, compact, expanded, custom, notchProps, ...prop
 
 const wrapperCss = css({
   position: 'relative',
+  width: 'max-content',
 });
 
 const notchCss = css({
