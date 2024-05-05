@@ -37,7 +37,7 @@ export function PhoneCall() {
       <motion.div
         initial={{ opacity: 0, scale: 0.8, filter: 'blur(10px)', rotateX: 45 }}
         animate={{ opacity: 1, scale: 1, filter: 'blur(0px)', rotateX: 0, transition: { delay: 0.1 } }}
-        exit={{ opacity: 0, scale: 0.8, filter: 'blur(10px)', rotateX: 45, transition: { delay: 0 } }}
+        exit={{ opacity: 0, scale: 0.8, filter: 'blur(10px)', rotateX: 45 }}
         css={phoneCallCss}
       >
         <img
@@ -47,10 +47,10 @@ export function PhoneCall() {
           height={45}
           style={{ borderRadius: '50%', backgroundColor: '#707070' }}
         />
-        <div style={{ flex: 1 }}>
+        <motion.div style={{ flex: 1, whiteSpace: 'nowrap' }}>
           <p style={{ fontSize: '13px', color: '#707070' }}>mobile</p>
           <p style={{ fontSize: '16px' }}>Juhyeok Kang</p>
-        </div>
+        </motion.div>
         <IconPhoneDownCircleFill style={{ cursor: 'pointer' }} />
         <IconPhoneCircleFill style={{ cursor: 'pointer' }} />
       </motion.div>

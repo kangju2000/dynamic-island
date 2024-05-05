@@ -13,4 +13,5 @@ export type Squircle = {
   height: number;
   cornerRadius: number;
   cornerSmoothing: number;
+  preserveSmoothing?: boolean;
 };

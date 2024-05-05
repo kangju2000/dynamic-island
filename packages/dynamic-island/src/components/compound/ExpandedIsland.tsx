@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 import { getSvgPath } from 'figma-squircle';
 import { HTMLMotionProps, motion, useWillChange } from 'framer-motion';
-import { squircleVariant } from '../../constant';
+import { squircleVariant, variantPathMap } from '../../constant';
 
 type ExpandIslandProps = {
   children: React.ReactNode;
@@ -15,7 +15,7 @@ export function ExpandedIsland({ children, ...props }: ExpandIslandProps) {
       initial={{
         width: squircleVariant.default.width,
         height: squircleVariant.default.height,
-        clipPath: `path("${getSvgPath(squircleVariant.default)}")`,
+        clipPath: variantPathMap.default,
       }}
       animate={{
         width: squircleVariant.expanded.width,
@@ -25,7 +25,7 @@ export function ExpandedIsland({ children, ...props }: ExpandIslandProps) {
       exit={{
         width: squircleVariant.default.width,
         height: squircleVariant.default.height,
-        clipPath: `path("${getSvgPath(squircleVariant.default)}")`,
+        clipPath: variantPathMap.default,
       }}
       css={expandedIslandCss}
       style={{ willChange }}

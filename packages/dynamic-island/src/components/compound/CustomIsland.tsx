@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
-import { getSvgPath } from 'figma-squircle';
+import { type FigmaSquircleParams, getSvgPath } from 'figma-squircle';
 import { type HTMLMotionProps, motion, useWillChange } from 'framer-motion';
-import { squircleVariant } from '../../constant';
+import { squircleVariant, variantPathMap } from '../../constant';
 import type { Squircle } from '../../types';
 
 type CustomIsland = {
@@ -11,29 +11,33 @@ type CustomIsland = {
 
 export function CustomIsland({ squircle, children, ...props }: CustomIsland) {
   const willChange = useWillChange();
-  const customSquircle = {
+  const customSquircle: FigmaSquircleParams = {
     width: squircle?.width ?? squircleVariant.default.width,
     height: squircle?.height ?? squircleVariant.default.height,
     cornerRadius: squircle?.cornerRadius ?? squircleVariant.default.cornerRadius,
     cornerSmoothing: squircle?.cornerSmoothing ?? squircleVariant.default.cornerSmoothing,
+    preserveSmoothing: squircle?.preserveSmoothing ?? squircleVariant.default.preserveSmoothing,
   };
 
   return (
     <motion.div
       initial={{
+        scale: 0,
         width: squircleVariant.default.width,
         height: squircleVariant.default.height,
-        clipPath: `path("${getSvgPath(squircleVariant.default)}")`,
+        clipPath: variantPathMap.default,
       }}
       animate={{
         width: customSquircle.width,
         height: customSquircle.height,
+        scale: 1,
         clipPath: `path("${getSvgPath(customSquircle)}")`,
       }}
       exit={{
+        scale: 0,
         width: squircleVariant.default.width,
         height: squircleVariant.default.height,
-        clipPath: `path("${getSvgPath(squircleVariant.default)}")`,
+        clipPath: variantPathMap.default,
       }}
       transition={{
         type: 'spring',
@@ -53,5 +57,6 @@ export function CustomIsland({ squircle, children, ...props }: CustomIsland) {
 const customIslandCss = css({
   position: 'relative',
   backgroundColor: '#000',
+  borderRadius: '32px',
   overflow: 'hidden',
 });
