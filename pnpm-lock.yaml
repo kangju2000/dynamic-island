@@ -23,6 +23,9 @@ importers:
       '@kangju2000/dynamic-island':
         specifier: workspace:^
         version: link:../../packages/dynamic-island
+      figma-squircle:
+        specifier: ^0.3.1
+        version: 0.3.1
       framer-motion:
         specifier: ^10.12.2
         version: 10.18.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)

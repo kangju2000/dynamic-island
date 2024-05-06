@@ -28,9 +28,9 @@ export function CustomIsland({ squircle, children, ...props }: CustomIsland) {
         clipPath: variantPathMap.default,
       }}
       animate={{
+        scale: 1,
         width: customSquircle.width,
         height: customSquircle.height,
-        scale: 1,
         clipPath: `path("${getSvgPath(customSquircle)}")`,
       }}
       exit={{

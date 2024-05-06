@@ -27,6 +27,12 @@ export function ExpandedIsland({ children, ...props }: ExpandIslandProps) {
         height: squircleVariant.default.height,
         clipPath: variantPathMap.default,
       }}
+      transition={{
+        type: 'spring',
+        stiffness: 100,
+        damping: 12,
+        mass: 0.5,
+      }}
       css={expandedIslandCss}
       style={{ willChange }}
       {...props}
@@ -40,4 +46,5 @@ const expandedIslandCss = css({
   position: 'relative',
   backgroundColor: '#000',
   overflow: 'hidden',
+  borderRadius: '32px',
 });
