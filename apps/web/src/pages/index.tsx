@@ -1,5 +1,5 @@
 import { css } from '@emotion/react';
-import { DynamicIsland, type DynamicIslandVariant, DynamicIslandMode } from '@kangju2000/dynamic-island';
+import { DynamicIsland, DynamicIslandMode } from '@kangju2000/dynamic-island';
 import { useState } from 'react';
 import { MusicPlayer } from '../components/MusicPlayer';
 import { PhoneCall } from '../components/PhoneCall';
