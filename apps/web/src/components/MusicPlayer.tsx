@@ -1,16 +1,41 @@
 import { css } from '@emotion/react';
 import { DynamicIsland } from '@kangju2000/dynamic-island';
 import { getSvgPath } from 'figma-squircle';
-import { motion } from 'framer-motion';
+import { motion, useAnimate } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import { IconBack, IconPause, IconNext, IconAirplay } from './../assets/index';
 
+const musicList = [
+  {
+    thumbnail:
+      'https://i.namu.wiki/i/bWKNh-vz2xRZArCYPgVkfAf34W3zqhv9x9RG52DmbYSdlitkhI-mX6UVP7w2gZ78qY5Sjq16vkcBy6oXebxFhg.webp',
+    title: '에잇(feat. SUGA)',
+    artist: '아이유(IU)',
+    playTime: 168,
+  },
+  {
+    thumbnail:
+      'https://i.namu.wiki/i/HpzXMX5uVsiL92XbAipUR44SV66FoCCJnrKIzgp94OypbsuIytg-UjhoH-UaekyXVhehL_uPxeS0GiCR7-fZEmQaw0GZecHyTq2IhWOQ4DaOeSVLn5JtWy6XsF9ZSljX51yym38i-4ZC-3aIaDEYeQ.jpg',
+    title: 'Hype Boy',
+    artist: 'NewJeans',
+    playTime: 179,
+  },
+];
+
+function formatTime(time: number) {
+  const minutes = Math.floor(time / 60);
+  const seconds = Math.floor(time % 60);
+  return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
+}
+
 export function MusicPlayer() {
-  const path = getSvgPath({ width: 60, height: 60, cornerRadius: 16, cornerSmoothing: 0.6 });
+  const [currentMusicIndex, setCurrentMusicIndex] = useState(0);
+  const [time, setTime] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [scopeThumbnail, animateThumbnail] = useAnimate();
+  const thumbnailPath = getSvgPath({ width: 60, height: 60, cornerRadius: 16, cornerSmoothing: 0.6 });
 
-  const calPosByYPos = (y: number) => {
-    return 12 - y / 2;
-  };
-
+  const currentMusic = musicList[currentMusicIndex];
   const getRandomHeightKeyframes = (times: number, minHeight = 2, maxHeight = 20) => {
     const keyframes = Array.from({ length: times }).reduce<{ y: number[]; height: number[] }>(
       acc => {
@@ -25,6 +50,35 @@ export function MusicPlayer() {
     return keyframes;
   };
 
+  useEffect(() => {
+    if (isPlaying) {
+      const interval = setInterval(() => {
+        setTime(prevTime => {
+          if (prevTime >= currentMusic.playTime) {
+            setCurrentMusicIndex((currentMusicIndex + 1) % musicList.length);
+            return 0;
+          }
+
+          return prevTime + 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isPlaying]);
+
+  useEffect(() => {
+    setTime(0);
+    animateThumbnail(
+      scopeThumbnail.current,
+      {
+        rotateY: [0, -180, 0],
+        scaleX: [1, -1, 1],
+      },
+      { duration: 1 }
+    );
+  }, [currentMusicIndex]);
+
   return (
     <DynamicIsland.Expanded>
       <motion.div
@@ -34,13 +88,30 @@ export function MusicPlayer() {
         css={musicPlayerCss}
       >
         <motion.div css={musicInfoCss}>
-          <motion.div css={thumbnailCss} style={{ clipPath: `path("${path}")` }} />
+          <motion.div
+            ref={scopeThumbnail}
+            animate={{
+              scale: isPlaying ? 1 : 0.9,
+              filter: isPlaying ? 'opacity(1)' : 'opacity(0.6)',
+              transition: {
+                scale: { duration: 0.35 },
+                filter: { duration: 0.35 },
+              },
+            }}
+            css={thumbnailWrapperCss}
+          >
+            <img src={currentMusic.thumbnail} css={thumbnailCss} style={{ clipPath: `path("${thumbnailPath}")` }} />
+            <div css={backfaceCss} style={{ clipPath: `path("${thumbnailPath}")` }} />
+          </motion.div>
           <div style={{ flex: 1 }}>
-            <p css={titleCss}>Title</p>
-            <p css={artistCss}>Artist</p>
+            <p css={titleCss}>{currentMusic.title}</p>
+            <p css={artistCss}>{currentMusic.artist}</p>
           </div>
           <svg width="24" height="24" viewBox="0 0 24 24" style={{ verticalAlign: 'start' }}>
             {Array.from({ length: 5 }).map((_, index) => {
+              if (!isPlaying) {
+                return <rect key={index} x={3 + index * 4} y="11" width="2" height="2" rx="1" fill="#eee" />;
+              }
               return (
                 <motion.rect
                   key={index}
@@ -61,16 +132,33 @@ export function MusicPlayer() {
           </svg>
         </motion.div>
         <div css={timeWrapperCss}>
-          <p css={timeCss}>0:00</p>
+          <p css={timeCss} style={{ left: 0 }}>
+            {formatTime(time)}
+          </p>
           <div css={outerBarCss}>
-            <motion.div css={innerBarCss} animate={{ width: '40%' }} transition={{ duration: 10, ease: 'linear' }} />
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${(time / currentMusic.playTime) * 100}%` }}
+              transition={{ ease: 'linear' }}
+              css={innerBarCss}
+            />
           </div>
-          <p css={timeCss}>-3:00</p>
+          <p css={timeCss} style={{ right: 0 }}>
+            -{formatTime(currentMusic.playTime - time)}
+          </p>
         </div>
         <div css={playerWrapperCss}>
-          <IconBack width={38} height={38} />
-          <IconPause width={40} height={40} />
-          <IconNext width={38} height={38} />
+          <IconBack
+            width={38}
+            height={38}
+            onClick={() => setCurrentMusicIndex((currentMusicIndex - 1 + musicList.length) % musicList.length)}
+          />
+          <IconPause width={40} height={40} onClick={() => setIsPlaying(!isPlaying)} />
+          <IconNext
+            width={38}
+            height={38}
+            onClick={() => setCurrentMusicIndex((currentMusicIndex + 1) % musicList.length)}
+          />
           <IconAirplay css={airplayCss} width={32} height={32} />
         </div>
       </motion.div>
@@ -100,35 +188,52 @@ const titleCss = css({
 
 const artistCss = css({
   fontSize: '17px',
-  opacity: 0.6,
+  color: 'rgba(255, 255, 255, 0.6)',
+});
+
+const thumbnailWrapperCss = css({
+  position: 'relative',
+  width: '65px',
+  height: '65px',
+  transformStyle: 'preserve-3d',
 });
 
 const thumbnailCss = css({
-  width: '65px',
-  height: '65px',
-  backgroundColor: '#333',
+  width: '100%',
+  height: '100%',
+  backgroundColor: 'rgba(255, 255, 255, 0.6)',
+  backfaceVisibility: 'hidden',
 });
 
+const backfaceCss = css(
+  {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    transform: 'rotateY(180deg)',
+  },
+  thumbnailCss
+);
+
 const timeWrapperCss = css({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '12px',
+  position: 'relative',
 });
 
 const timeCss = css({
+  position: 'absolute',
+  top: '50%',
+  transform: 'translateY(-50%)',
   fontSize: '12px',
   color: 'rgba(255, 255, 255, 0.6)',
 });
 
 const outerBarCss = css({
-  width: '100%',
+  width: '240px',
+  margin: '0 auto',
   height: '7px',
   backgroundColor: 'rgba(255, 255, 255, 0.2)',
   borderRadius: '24px',
   overflow: 'hidden',
-  display: 'flex',
-  alignItems: 'center',
-  gap: '4px',
 });
 
 const innerBarCss = css({
