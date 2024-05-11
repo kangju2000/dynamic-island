@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 import { DynamicIsland } from '@kangju2000/dynamic-island';
 import { getSvgPath } from 'figma-squircle';
-import { motion, useAnimate } from 'framer-motion';
+import { AnimatePresence, cubicBezier, motion, useAnimate } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { IconBack, IconPause, IconNext, IconAirplay, IconPlay } from '../../assets/index';
 import { Bar } from './Bar';
@@ -20,31 +20,47 @@ export function MusicPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [scopeThumbnail, animateThumbnail] = useAnimate();
   const thumbnailPath = getSvgPath({ width: 60, height: 60, cornerRadius: 16, cornerSmoothing: 0.6 });
-  const initialRef = useRef<boolean>(true);
+  const initialRender = useRef<boolean>(true);
 
   const currentMusic = musicList[currentMusicIndex];
 
+  const handleProgress = (timeout: number) => {
+    setTime(prevTime => {
+      const nextTime = prevTime + timeout / 1000;
+      if (nextTime >= currentMusic.playTime) {
+        handleNextMusic();
+        return 0;
+      }
+
+      return nextTime;
+    });
+  };
+
+  const handleNextMusic = () => {
+    setCurrentMusicIndex((currentMusicIndex + 1) % musicList.length);
+  };
+
+  const handlePrevMusic = () => {
+    setCurrentMusicIndex((currentMusicIndex - 1 + musicList.length) % musicList.length);
+  };
+
   useEffect(() => {
-    if (isPlaying) {
-      const interval = setInterval(() => {
-        setTime(prevTime => {
-          if (prevTime >= currentMusic.playTime) {
-            setCurrentMusicIndex((currentMusicIndex + 1) % musicList.length);
-            return 0;
-          }
-
-          return prevTime + 0.1;
-        });
-      }, 100);
-
-      return () => clearInterval(interval);
+    if (!isPlaying) {
+      return;
     }
+
+    const timeout = 100;
+    const interval = setInterval(() => handleProgress(timeout), timeout);
+
+    return () => {
+      clearInterval(interval);
+    };
   }, [isPlaying]);
 
   useEffect(() => {
     setIsPlaying(true);
-    if (initialRef.current) {
-      initialRef.current = false;
+    if (initialRender.current) {
+      initialRender.current = false;
       return;
     }
 
@@ -89,6 +105,9 @@ export function MusicPlayer() {
           </div>
           <Equalizer isPlaying={isPlaying} />
         </div>
+
+        <div style={{ height: '16px' }} />
+
         <div css={timeWrapperCss}>
           <p css={timeCss} style={{ left: 0 }}>
             {formatTime(time)}
@@ -98,22 +117,34 @@ export function MusicPlayer() {
             -{formatTime(currentMusic.playTime - time)}
           </p>
         </div>
+
+        <div style={{ height: '8px' }} />
+
         <div css={playerWrapperCss}>
-          <IconBack
-            width={38}
-            height={38}
-            onClick={() => setCurrentMusicIndex((currentMusicIndex - 1 + musicList.length) % musicList.length)}
-          />
-          {isPlaying ? (
-            <IconPause width={40} height={40} onClick={() => setIsPlaying(false)} />
-          ) : (
-            <IconPlay width={40} height={40} onClick={() => setIsPlaying(true)} />
-          )}
-          <IconNext
-            width={38}
-            height={38}
-            onClick={() => setCurrentMusicIndex((currentMusicIndex + 1) % musicList.length)}
-          />
+          <motion.div>
+            <IconBack width={38} height={38} onClick={handlePrevMusic} />
+          </motion.div>
+
+          <AnimatePresence mode="popLayout">
+            <motion.div
+              key={isPlaying ? 'pause' : 'play'}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ delay: 0.08 }}
+              whileTap={{ scale: 0.9, backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+              css={pauseCss}
+              onClick={() => setIsPlaying(prev => !prev)}
+            >
+              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
+                {isPlaying ? <IconPause width={40} height={40} /> : <IconPlay width={40} height={40} />}
+              </motion.div>
+            </motion.div>
+          </AnimatePresence>
+
+          <motion.div>
+            <IconNext width={38} height={38} onClick={handleNextMusic} />
+          </motion.div>
           <IconAirplay css={airplayCss} width={32} height={32} />
         </div>
       </motion.div>
@@ -124,7 +155,6 @@ export function MusicPlayer() {
 const musicPlayerCss = css({
   display: 'flex',
   flexDirection: 'column',
-  gap: '16px',
   width: '100%',
   height: '100%',
   padding: '24px',
@@ -191,6 +221,16 @@ const playerWrapperCss = css({
   svg: {
     cursor: 'pointer',
   },
+});
+
+const pauseCss = css({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '60px',
+  height: '60px',
+  borderRadius: '50%',
+  // backgroundColor: 'rgba(255, 255, 255, 0.1)',
 });
 
 const airplayCss = css({
