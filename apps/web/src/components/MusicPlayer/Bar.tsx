@@ -21,7 +21,7 @@ export function Bar({ time, music }: BarProps) {
 }
 
 const outerBarCss = css({
-  width: '240px',
+  width: '100%',
   margin: '0 auto',
   height: '7px',
   backgroundColor: 'rgba(255, 255, 255, 0.2)',

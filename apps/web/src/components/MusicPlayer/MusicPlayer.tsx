@@ -2,6 +2,7 @@ import { css } from '@emotion/react';
 import { DynamicIsland } from '@kangju2000/dynamic-island';
 import { getSvgPath } from 'figma-squircle';
 import { AnimatePresence, motion, useAnimate } from 'framer-motion';
+import { cubicBezier } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { IconPause, IconAirplay, IconPlay } from '../../assets/index';
 import { Bar } from './Bar';
@@ -88,7 +89,7 @@ export function MusicPlayer() {
     <DynamicIsland.Expanded>
       <motion.div
         initial={{ opacity: 0, scale: 0.8, filter: 'blur(10px)', rotateX: 45 }}
-        animate={{ opacity: 1, scale: 1, filter: 'blur(0px)', rotateX: 0, transition: { delay: 0.1 } }}
+        animate={{ opacity: 1, scale: 1, filter: 'blur(0px)', rotateX: 0, transition: { delay: 0.15 } }}
         exit={{ opacity: 0, scale: 0.8, filter: 'blur(10px)', rotateX: 45 }}
         css={musicPlayerCss}
       >
@@ -108,26 +109,23 @@ export function MusicPlayer() {
             <img src={currentMusic.thumbnail} css={thumbnailCss} style={{ clipPath: `path("${thumbnailPath}")` }} />
             <div css={backfaceCss} style={{ clipPath: `path("${thumbnailPath}")` }} />
           </motion.div>
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: 1, whiteSpace: 'nowrap' }}>
             <p css={titleCss}>{currentMusic.title}</p>
             <p css={artistCss}>{currentMusic.artist}</p>
           </div>
           <Equalizer isPlaying={isPlaying} />
         </div>
 
-        <div style={{ height: '16px' }} />
-
+        <div style={{ flexShrink: 0, height: '16px' }} />
         <div css={timeWrapperCss}>
-          <p css={timeCss} style={{ left: 0 }}>
-            {formatTime(time)}
-          </p>
+          <p css={timeCss}>{formatTime(time)}</p>
           <Bar time={time} music={currentMusic} />
-          <p css={timeCss} style={{ right: 0 }}>
+          <p css={timeCss} style={{ textAlign: 'right' }}>
             -{formatTime(currentMusic.playTime - time)}
           </p>
         </div>
 
-        <div style={{ height: '8px' }} />
+        <div style={{ flexShrink: 0, height: '8px' }} />
 
         <div css={playerWrapperCss}>
           <motion.div
@@ -142,7 +140,7 @@ export function MusicPlayer() {
                   temp.push(first!);
                   return temp;
                 });
-              }, 150);
+              }, 200);
             }}
           >
             <AnimatePresence mode="popLayout">
@@ -153,7 +151,7 @@ export function MusicPlayer() {
                     initial={{ opacity: 0, scale: 0 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0 }}
-                    transition={{ duration: 0.3 }}
+                    transition={{ duration: 0.5, ease: cubicBezier(0.34, 1.56, 0.64, 1) }}
                     layout
                   >
                     <svg width="17" height="19" viewBox="0 0 17 19" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -179,7 +177,12 @@ export function MusicPlayer() {
               css={playerIconAreaCss}
               onClick={() => setIsPlaying(prev => !prev)}
             >
-              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0 }}
+                transition={{ duration: 0.5, ease: cubicBezier(0.34, 1.56, 0.64, 1) }}
+              >
                 {isPlaying ? <IconPause width={40} height={40} /> : <IconPlay width={40} height={40} />}
               </motion.div>
             </motion.div>
@@ -197,18 +200,18 @@ export function MusicPlayer() {
                   temp.unshift(last!);
                   return temp;
                 });
-              }, 150);
+              }, 200);
             }}
           >
             <AnimatePresence mode="popLayout">
-              {nextArrowList.slice(-2).map(item => {
+              {nextArrowList.slice(0, 2).map(item => {
                 return (
                   <motion.div
                     key={item}
                     initial={{ opacity: 0, scale: 0 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0 }}
-                    transition={{ duration: 0.3 }}
+                    transition={{ duration: 0.5, ease: cubicBezier(0.34, 1.56, 0.64, 1) }}
                     layout
                   >
                     <svg width="17" height="19" viewBox="0 0 17 19" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -254,6 +257,7 @@ const artistCss = css({
 });
 
 const thumbnailWrapperCss = css({
+  flexShrink: 0,
   position: 'relative',
   width: '65px',
   height: '65px',
@@ -279,12 +283,14 @@ const backfaceCss = css(
 
 const timeWrapperCss = css({
   position: 'relative',
+  display: 'flex',
+  alignItems: 'center',
+  // gap: '8px',
 });
 
 const timeCss = css({
-  position: 'absolute',
-  top: '50%',
-  transform: 'translateY(-50%)',
+  flexShrink: 0,
+  width: '40px',
   fontSize: '12px',
   color: 'rgba(255, 255, 255, 0.6)',
 });
