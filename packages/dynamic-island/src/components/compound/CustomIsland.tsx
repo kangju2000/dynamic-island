@@ -12,29 +12,26 @@ type CustomIsland = {
 export function CustomIsland({ squircle, children, ...props }: CustomIsland) {
   const willChange = useWillChange();
   const customSquircle: FigmaSquircleParams = {
-    width: squircle?.width ?? squircleVariant.default.width,
-    height: squircle?.height ?? squircleVariant.default.height,
-    cornerRadius: squircle?.cornerRadius ?? squircleVariant.default.cornerRadius,
-    cornerSmoothing: squircle?.cornerSmoothing ?? squircleVariant.default.cornerSmoothing,
-    preserveSmoothing: squircle?.preserveSmoothing ?? squircleVariant.default.preserveSmoothing,
+    width: squircle?.width ?? squircleVariant.custom.width,
+    height: squircle?.height ?? squircleVariant.custom.height,
+    cornerRadius: squircle?.cornerRadius ?? squircleVariant.custom.cornerRadius,
+    cornerSmoothing: squircle?.cornerSmoothing ?? squircleVariant.custom.cornerSmoothing,
+    preserveSmoothing: squircle?.preserveSmoothing ?? squircleVariant.custom.preserveSmoothing,
   };
 
   return (
     <motion.div
       initial={{
-        scale: 0,
         width: squircleVariant.default.width,
         height: squircleVariant.default.height,
         clipPath: variantPathMap.default,
       }}
       animate={{
-        scale: 1,
         width: customSquircle.width,
         height: customSquircle.height,
         clipPath: `path("${getSvgPath(customSquircle)}")`,
       }}
       exit={{
-        scale: 0,
         width: squircleVariant.default.width,
         height: squircleVariant.default.height,
         clipPath: variantPathMap.default,

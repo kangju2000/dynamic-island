@@ -21,7 +21,6 @@ export function MusicPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [scopeThumbnail, animateThumbnail] = useAnimate();
   const thumbnailPath = getSvgPath({ width: 60, height: 60, cornerRadius: 16, cornerSmoothing: 0.6 });
-  const initialRender = useRef<boolean>(true);
   const timeoutId = useRef<number>(0);
   const [prevArrowList, setPrevArrowList] = useState([1, 2, 3]);
   const [nextArrowList, setNextArrowList] = useState([1, 2, 3]);
@@ -42,10 +41,36 @@ export function MusicPlayer() {
 
   const handleNextMusic = () => {
     setCurrentMusicIndex((currentMusicIndex + 1) % musicList.length);
+    setIsPlaying(true);
+    setTime(0);
+    animateThumbnail(
+      [scopeThumbnail.current, scopeThumbnail.current.firstChild],
+      { rotateY: [0, -180, 0] },
+      {
+        duration: 2,
+        times: [0, 0.25, 1],
+        ease: ['linear', cubicBezier(0.5, 1.5, 0.5, 1)],
+        // onUpdate: (values: number) => {
+        //   console.log(Math.abs(values) / 180);
+        //   scopeThumbnail.current.style.WebkitMaskImage = `linear-gradient(90deg, rgba(0,0,0,${Math.abs(values) / 180}) 50%, transparent 100%)`;
+        // },
+      }
+    );
   };
 
   const handlePrevMusic = () => {
     setCurrentMusicIndex((currentMusicIndex - 1 + musicList.length) % musicList.length);
+    setIsPlaying(true);
+    setTime(0);
+    animateThumbnail(
+      [scopeThumbnail.current, scopeThumbnail.current.firstChild],
+      { rotateY: [0, 180, 0] },
+      {
+        duration: 2,
+        times: [0, 0.25, 1],
+        ease: ['linear', cubicBezier(0.5, 1.5, 0.5, 1)],
+      }
+    );
   };
 
   useEffect(() => {
@@ -63,23 +88,7 @@ export function MusicPlayer() {
 
   useEffect(() => {
     setIsPlaying(true);
-    if (initialRender.current) {
-      initialRender.current = false;
-      return;
-    }
 
-    setTime(0);
-    animateThumbnail(
-      scopeThumbnail.current,
-      {
-        rotateY: [0, -180, 0],
-        scaleX: [1, -1, 1],
-      },
-      { duration: 1 }
-    );
-  }, [currentMusicIndex]);
-
-  useEffect(() => {
     return () => {
       clearTimeout(timeoutId.current);
     };
@@ -99,15 +108,22 @@ export function MusicPlayer() {
             animate={{
               scale: isPlaying ? 1 : 0.9,
               filter: isPlaying ? 'opacity(1)' : 'opacity(0.6)',
-              transition: {
-                scale: { duration: 0.35 },
-                filter: { duration: 0.35 },
-              },
+              transition: { duration: 0.35 },
             }}
             css={thumbnailWrapperCss}
           >
-            <img src={currentMusic.thumbnail} css={thumbnailCss} style={{ clipPath: `path("${thumbnailPath}")` }} />
-            <div css={backfaceCss} style={{ clipPath: `path("${thumbnailPath}")` }} />
+            <div css={thumbnailCss} className="thumbnail">
+              <img
+                src={currentMusic.thumbnail}
+                css={thumbnailFrontCss}
+                style={{ clipPath: `path("${thumbnailPath}")` }}
+              />
+              <img
+                src={currentMusic.thumbnail}
+                css={thumbnailBackCss}
+                style={{ clipPath: `path("${thumbnailPath}")` }}
+              />
+            </div>
           </motion.div>
           <div style={{ flex: 1, whiteSpace: 'nowrap' }}>
             <p css={titleCss}>{currentMusic.title}</p>
@@ -129,7 +145,7 @@ export function MusicPlayer() {
 
         <div css={playerWrapperCss}>
           <motion.div
-            whileTap={{ scale: 0.9, backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+            whileTap={{ scale: 0.8, backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
             css={playerIconAreaCss}
             onClick={() => {
               handlePrevMusic();
@@ -173,7 +189,7 @@ export function MusicPlayer() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ delay: 0.08 }}
-              whileTap={{ scale: 0.9, backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+              whileTap={{ scale: 0.8, backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
               css={playerIconAreaCss}
               onClick={() => setIsPlaying(prev => !prev)}
             >
@@ -189,7 +205,7 @@ export function MusicPlayer() {
           </AnimatePresence>
 
           <motion.div
-            whileTap={{ scale: 0.9, backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+            whileTap={{ scale: 0.8, backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
             css={playerIconAreaCss}
             onClick={() => {
               handleNextMusic();
@@ -258,34 +274,39 @@ const artistCss = css({
 
 const thumbnailWrapperCss = css({
   flexShrink: 0,
-  position: 'relative',
   width: '65px',
   height: '65px',
-  transformStyle: 'preserve-3d',
+  perspective: '260px',
 });
 
 const thumbnailCss = css({
+  position: 'relative',
+  width: '100%',
+  height: '100%',
+  transformStyle: 'preserve-3d',
+});
+
+const thumbnailFrontCss = css({
   width: '100%',
   height: '100%',
   backgroundColor: 'rgba(255, 255, 255, 0.6)',
   backfaceVisibility: 'hidden',
 });
 
-const backfaceCss = css(
+const thumbnailBackCss = css(
   {
     position: 'absolute',
     top: 0,
     left: 0,
-    transform: 'rotateY(180deg)',
+    transform: 'rotateY(180deg) scaleX(-1)',
   },
-  thumbnailCss
+  thumbnailFrontCss
 );
 
 const timeWrapperCss = css({
   position: 'relative',
   display: 'flex',
   alignItems: 'center',
-  // gap: '8px',
 });
 
 const timeCss = css({
@@ -300,9 +321,6 @@ const playerWrapperCss = css({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  svg: {
-    cursor: 'pointer',
-  },
 });
 
 const playerIconAreaCss = css({
@@ -312,6 +330,7 @@ const playerIconAreaCss = css({
   width: '60px',
   height: '60px',
   borderRadius: '50%',
+  cursor: 'pointer',
 });
 
 const airplayCss = css({
