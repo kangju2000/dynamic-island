@@ -23,7 +23,7 @@ export function CompactMusicPlayer({ music, state }: CompactMusicPlayerProps) {
       }
       trailing={
         <div css={trailingWrapperCss}>
-          <Equalizer isPlaying={state !== 'paused'} />
+          <Equalizer music={music} isPlaying={state !== 'paused'} />
         </div>
       }
     />

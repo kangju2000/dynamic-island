@@ -8,12 +8,7 @@ import { Bar } from './Bar';
 import { Equalizer } from './Equalizer';
 import { Thumbnail } from './Thumbnail';
 import { MusicInfo, MusicState } from './types';
-
-function formatTime(time: number) {
-  const minutes = Math.floor(time / 60);
-  const seconds = Math.floor(time % 60);
-  return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
-}
+import { formatTime } from './utils';
 
 type MusicPlayerProps = {
   music: MusicInfo;
@@ -83,7 +78,7 @@ export function MusicPlayer({ music, state, time, onTimeChange, onMusicChange }:
             <p css={titleCss}>{music.title}</p>
             <p css={artistCss}>{music.artist}</p>
           </div>
-          <Equalizer isPlaying={state !== 'paused'} />
+          <Equalizer music={music} isPlaying={state !== 'paused'} />
         </div>
 
         <div style={{ flexShrink: 0, height: '16px' }} />

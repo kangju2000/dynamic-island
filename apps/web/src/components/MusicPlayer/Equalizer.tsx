@@ -1,24 +1,19 @@
 import { motion } from 'framer-motion';
-import { memo } from 'react';
+import { memo, useEffect } from 'react';
+import { MusicInfo } from './types';
+import { getAverageColor, getRandomHeightKeyframes } from './utils';
 
 type EqualizerProps = {
+  music: MusicInfo;
   isPlaying: boolean;
 };
 
-export const Equalizer = memo(function Equalizer({ isPlaying }: EqualizerProps) {
-  const getRandomHeightKeyframes = (times: number, minHeight = 2, maxHeight = 20) => {
-    const keyframes = Array.from({ length: times }).reduce<{ y: number[]; height: number[] }>(
-      acc => {
-        const randomHeight = Math.floor(Math.random() * (maxHeight - minHeight + 1)) + minHeight;
-        acc.y.push(12 - randomHeight / 2);
-        acc.height.push(randomHeight);
-        return acc;
-      },
-      { y: [11], height: [2] }
-    );
-
-    return keyframes;
-  };
+export const Equalizer = memo(function Equalizer({ music, isPlaying }: EqualizerProps) {
+  useEffect(() => {
+    getAverageColor(music.thumbnail).then(color => {
+      document.documentElement.style.setProperty('--equalizer-color', color);
+    });
+  }, [music.id]);
 
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" style={{ verticalAlign: 'start' }}>
@@ -36,7 +31,7 @@ export const Equalizer = memo(function Equalizer({ isPlaying }: EqualizerProps) 
             x={3 + index * 4}
             width="2"
             rx="1"
-            fill="#eee"
+            fill="var(--equalizer-color, #eee)"
           />
         );
       })}
