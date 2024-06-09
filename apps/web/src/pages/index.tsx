@@ -7,60 +7,42 @@ import { PhoneCall } from '../components/PhoneCall';
 export function Home() {
   const [mode, setMode] = useState<DynamicIslandMode>(DynamicIslandMode.default);
 
+  const buttonText: Record<DynamicIslandMode, string> = {
+    [DynamicIslandMode.default]: 'Default',
+    [DynamicIslandMode.custom]: 'Phone Call',
+    [DynamicIslandMode.expanded]: 'Music Player',
+    [DynamicIslandMode.minimal]: '', // TODO: Add minimal preset
+    [DynamicIslandMode.compact]: '', // TODO: Add compact preset
+  };
+
   return (
     <div css={containerCss}>
       <DynamicIsland
         variant={mode}
         expanded={<MusicPlayer />}
-        minimal={<DynamicIsland.Minimal>minimal</DynamicIsland.Minimal>}
         compact={<DynamicIsland.Compact leading={'leading'} trailing={'trailing'} />}
         custom={<PhoneCall />}
       />
 
       <h1>Dynamic Island</h1>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', padding: '20px', border: '1px solid #333' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', textAlign: 'center' }}>
-          <h3>Preset</h3>
-          <button
-            onClick={() => setMode(DynamicIslandMode.custom)}
-            css={buttonCss}
-            style={{
-              backgroundColor: mode === DynamicIslandMode.custom ? '#333' : 'black',
-            }}
-          >
-            Phone Call
-          </button>
-          <button
-            onClick={() => setMode(DynamicIslandMode.expanded)}
-            css={buttonCss}
-            style={{ backgroundColor: mode === DynamicIslandMode.expanded ? '#333' : 'black' }}
-          >
-            Music Player
-          </button>
-        </div>
-        <div style={{ height: '1px', backgroundColor: '#333' }} />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', textAlign: 'center' }}>
-          <h3>Dynamic Island Mode</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', alignContent: 'center' }}>
-            {Object.values(DynamicIslandMode).map((v, index) => {
-              if (v === DynamicIslandMode.custom || v === DynamicIslandMode.minimal) {
-                return null;
-              }
+      <div style={{ display: 'flex', gap: '20px', textAlign: 'center' }}>
+        {Object.values(DynamicIslandMode).map((v, index) => {
+          if (buttonText[v] === '') {
+            return null;
+          }
 
-              return (
-                <button
-                  key={index}
-                  onClick={() => setMode(v)}
-                  css={buttonCss}
-                  style={{ backgroundColor: v === mode ? '#333' : 'black' }}
-                >
-                  {v}
-                </button>
-              );
-            })}
-          </div>
-        </div>
+          return (
+            <button
+              key={index}
+              onClick={() => setMode(v)}
+              css={buttonCss}
+              style={{ backgroundColor: v === mode ? '#333' : 'black' }}
+            >
+              {buttonText[v]}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

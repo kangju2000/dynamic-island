@@ -5,7 +5,7 @@ import { squircleVariant, type DynamicIslandVariant } from '..';
 import { CompactIsland } from './compound/CompactIsland';
 import { CustomIsland } from './compound/CustomIsland';
 import { ExpandedIsland } from './compound/ExpandedIsland';
-import { MinimalIsland } from './compound/MinimalIsland';
+// import { MinimalIsland } from './compound/MinimalIsland';
 import { Notch } from './compound/Notch';
 
 export type DynamicIslandProps = {
@@ -13,7 +13,7 @@ export type DynamicIslandProps = {
   /**
    * The minimal presentation in the Dynamic Island.
    */
-  minimal?: React.ReactNode;
+  // minimal?: React.ReactNode; // TODO
   /**
    * The compact presentation in the Dynamic Island.
    */
@@ -31,17 +31,35 @@ export type DynamicIslandProps = {
    * @default true
    */
   fixed?: boolean;
+  /**
+   * Whether the device has an iPhone notch.
+   * @default true
+   */
+  hasIphoneNotch?: boolean;
 } & React.ComponentProps<'div'>;
 
-function Root({ variant, minimal, compact, expanded, custom, fixed = true, ...props }: DynamicIslandProps) {
+function Root({
+  variant,
+  compact,
+  expanded,
+  custom,
+  fixed = true,
+  hasIphoneNotch = true,
+  ...props
+}: DynamicIslandProps) {
+  const render = {
+    default: <Notch css={notchCss} />,
+    compact,
+    expanded,
+    minimal: null, // TODO
+    custom,
+  }[variant];
+
   return (
     <div css={fixed ? fixedCss : relativeCss} {...props}>
-      <Notch css={notchCss} />
+      {hasIphoneNotch && <Notch css={notchCss} />}
       <AnimatePresence mode="wait">
-        {variant === 'compact' && <Fragment key="compact">{compact}</Fragment>}
-        {variant === 'expanded' && <Fragment key="expanded">{expanded}</Fragment>}
-        {variant === 'custom' && <Fragment key="custom">{custom}</Fragment>}
-        {variant === 'minimal' && <Fragment key="minimal">{minimal}</Fragment>}
+        <Fragment key={variant}>{render}</Fragment>
       </AnimatePresence>
       {!fixed && variant === 'default' && <div style={{ height: squircleVariant.default.height }} />}
     </div>
@@ -76,7 +94,7 @@ export const DynamicIsland = Object.assign(
     Notch,
     Compact: CompactIsland,
     Expanded: ExpandedIsland,
-    Minimal: MinimalIsland,
+    // Minimal: MinimalIsland, // TODO
     Custom: CustomIsland,
   }
 );
