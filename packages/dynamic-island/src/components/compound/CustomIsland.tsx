@@ -1,5 +1,5 @@
 import { css } from '@emotion/react';
-import { type FigmaSquircleParams, getSvgPath } from 'figma-squircle';
+import { getSvgPath } from 'figma-squircle';
 import { type HTMLMotionProps, motion, useWillChange } from 'framer-motion';
 import { squircleVariant, variantPathMap } from '../../constant';
 import type { Squircle } from '../../types';
@@ -9,15 +9,8 @@ type CustomIsland = {
   children?: React.ReactNode;
 } & HTMLMotionProps<'div'>;
 
-export function CustomIsland({ squircle, children, ...props }: CustomIsland) {
+export function CustomIsland({ squircle = squircleVariant.custom, children, ...props }: CustomIsland) {
   const willChange = useWillChange();
-  const customSquircle: FigmaSquircleParams = {
-    width: squircle?.width ?? squircleVariant.custom.width,
-    height: squircle?.height ?? squircleVariant.custom.height,
-    cornerRadius: squircle?.cornerRadius ?? squircleVariant.custom.cornerRadius,
-    cornerSmoothing: squircle?.cornerSmoothing ?? squircleVariant.custom.cornerSmoothing,
-    preserveSmoothing: squircle?.preserveSmoothing ?? squircleVariant.custom.preserveSmoothing,
-  };
 
   return (
     <motion.div
@@ -27,14 +20,15 @@ export function CustomIsland({ squircle, children, ...props }: CustomIsland) {
         clipPath: variantPathMap.default,
       }}
       animate={{
-        width: customSquircle.width,
-        height: customSquircle.height,
-        clipPath: `path("${getSvgPath(customSquircle)}")`,
+        width: squircle.width,
+        height: squircle.height,
+        clipPath: `path("${getSvgPath(squircle)}")`,
       }}
       exit={{
         width: squircleVariant.default.width,
         height: squircleVariant.default.height,
         clipPath: variantPathMap.default,
+        transition: { type: 'spring', stiffness: 150, damping: 18, mass: 0.5 },
       }}
       transition={{
         type: 'spring',

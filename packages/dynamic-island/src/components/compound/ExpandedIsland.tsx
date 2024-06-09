@@ -25,6 +25,7 @@ export function ExpandedIsland({ children, ...props }: ExpandIslandProps) {
         width: squircleVariant.default.width,
         height: squircleVariant.default.height,
         clipPath: variantPathMap.default,
+        transition: { type: 'spring', stiffness: 150, damping: 18, mass: 0.5 },
       }}
       transition={{
         type: 'spring',

@@ -26,6 +26,7 @@ export const Equalizer = memo(function Equalizer({ isPlaying }: EqualizerProps) 
         return (
           <motion.rect
             key={index}
+            initial={{ y: 11, height: 2 }}
             animate={isPlaying ? getRandomHeightKeyframes(10) : { y: 11, height: 2 }}
             transition={
               isPlaying

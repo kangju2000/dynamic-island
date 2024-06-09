@@ -5,3 +5,5 @@ export type MusicInfo = {
   artist: string;
   playTime: number;
 };
+
+export type MusicState = 'playing' | 'paused' | 'next' | 'previous';

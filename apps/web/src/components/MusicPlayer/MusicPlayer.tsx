@@ -1,13 +1,13 @@
 import { css } from '@emotion/react';
 import { DynamicIsland } from '@kangju2000/dynamic-island';
-import { getSvgPath } from 'figma-squircle';
-import { AnimatePresence, motion, useAnimate } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { cubicBezier } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { IconPause, IconAirplay, IconPlay } from '../../assets/index';
 import { Bar } from './Bar';
 import { Equalizer } from './Equalizer';
-import { MusicInfo } from './types';
+import { Thumbnail } from './Thumbnail';
+import { MusicInfo, MusicState } from './types';
 
 function formatTime(time: number) {
   const minutes = Math.floor(time / 60);
@@ -16,79 +16,49 @@ function formatTime(time: number) {
 }
 
 type MusicPlayerProps = {
-  currentMusic: MusicInfo;
-  isPlaying: boolean;
-  onEnd?: () => void;
-  onPlay?: () => void;
-  onPause?: () => void;
-  onPrev?: () => void;
-  onNext?: () => void;
+  music: MusicInfo;
+  state: MusicState;
+  time: number;
+  onTimeChange: Dispatch<SetStateAction<number>>;
+  onMusicChange?: (state: MusicState) => void;
 };
 
-export function MusicPlayer({ currentMusic, isPlaying, onEnd, onPlay, onPause, onPrev, onNext }: MusicPlayerProps) {
-  const [time, setTime] = useState(0);
-  const [scopeThumbnail, animateThumbnail] = useAnimate();
-  const thumbnailPath = getSvgPath({ width: 60, height: 60, cornerRadius: 16, cornerSmoothing: 0.6 });
+export function MusicPlayer({ music, state, time, onTimeChange, onMusicChange }: MusicPlayerProps) {
   const timeoutId = useRef<number>(0);
   const [prevArrowList, setPrevArrowList] = useState([1, 2, 3]);
   const [nextArrowList, setNextArrowList] = useState([1, 2, 3]);
 
-  const handleProgress = (timeout: number) => {
-    setTime(prevTime => {
-      const nextTime = prevTime + timeout / 1000;
-      if (nextTime >= currentMusic.playTime) {
-        onEnd?.();
-        handleNextMusic();
-        return 0;
-      }
-
-      return nextTime;
-    });
-  };
-
   const handleNextMusic = () => {
-    onNext();
-    setTime(0);
-    animateThumbnail(
-      [scopeThumbnail.current, scopeThumbnail.current.firstChild],
-      { rotateY: [0, -180, 0] },
-      {
-        duration: 2,
-        times: [0, 0.25, 1],
-        ease: ['linear', cubicBezier(0.5, 1.5, 0.5, 1)],
-      }
-    );
+    onMusicChange?.('next');
+    onTimeChange(0);
   };
 
   const handlePrevMusic = () => {
-    onPrev();
-    setTime(0);
-    animateThumbnail(
-      [scopeThumbnail.current, scopeThumbnail.current.firstChild],
-      { rotateY: [0, 180, 0] },
-      {
-        duration: 2,
-        times: [0, 0.25, 1],
-        ease: ['linear', cubicBezier(0.5, 1.5, 0.5, 1)],
-      }
-    );
+    onMusicChange?.('previous');
+    onTimeChange(0);
   };
 
   useEffect(() => {
-    if (!isPlaying) {
+    if (state === 'paused') {
       return;
     }
 
     const timeout = 100;
-    const interval = setInterval(() => handleProgress(timeout), timeout);
+    const interval = setInterval(() => {
+      onTimeChange(prev => prev + timeout / 1000);
+    }, timeout);
 
     return () => {
       clearInterval(interval);
     };
-  }, [isPlaying]);
+  }, [state]);
 
   useEffect(() => {
-    onPlay();
+    if (state === 'playing') {
+      return;
+    }
+
+    onMusicChange?.('playing');
 
     return () => {
       clearTimeout(timeoutId.current);
@@ -104,41 +74,24 @@ export function MusicPlayer({ currentMusic, isPlaying, onEnd, onPlay, onPause, o
         css={musicPlayerCss}
       >
         <div css={musicInfoCss}>
-          <motion.div
-            ref={scopeThumbnail}
-            animate={{
-              scale: isPlaying ? 1 : 0.9,
-              filter: isPlaying ? 'opacity(1)' : 'opacity(0.6)',
-              transition: { duration: 0.35 },
-            }}
-            css={thumbnailWrapperCss}
-          >
-            <div css={thumbnailCss} className="thumbnail">
-              <img
-                src={currentMusic.thumbnail}
-                css={thumbnailFrontCss}
-                style={{ clipPath: `path("${thumbnailPath}")` }}
-              />
-              <img
-                src={currentMusic.thumbnail}
-                css={thumbnailBackCss}
-                style={{ clipPath: `path("${thumbnailPath}")` }}
-              />
-            </div>
-          </motion.div>
+          <Thumbnail
+            squircle={{ width: 60, height: 60, cornerRadius: 16, cornerSmoothing: 0.6 }}
+            music={music}
+            state={state}
+          />
           <div style={{ flex: 1, whiteSpace: 'nowrap' }}>
-            <p css={titleCss}>{currentMusic.title}</p>
-            <p css={artistCss}>{currentMusic.artist}</p>
+            <p css={titleCss}>{music.title}</p>
+            <p css={artistCss}>{music.artist}</p>
           </div>
-          <Equalizer isPlaying={isPlaying} />
+          <Equalizer isPlaying={state !== 'paused'} />
         </div>
 
         <div style={{ flexShrink: 0, height: '16px' }} />
         <div css={timeWrapperCss}>
           <p css={timeCss}>{formatTime(time)}</p>
-          <Bar time={time} music={currentMusic} />
+          <Bar time={time} music={music} />
           <p css={timeCss} style={{ textAlign: 'right' }}>
-            -{formatTime(currentMusic.playTime - time)}
+            -{formatTime(music.playTime - time)}
           </p>
         </div>
 
@@ -183,14 +136,16 @@ export function MusicPlayer({ currentMusic, isPlaying, onEnd, onPlay, onPause, o
 
           <AnimatePresence mode="popLayout">
             <motion.div
-              key={isPlaying ? 'pause' : 'play'}
+              key={state}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ delay: 0.08 }}
               whileTap={{ scale: 0.8, backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
               css={playerIconAreaCss}
-              onClick={isPlaying ? onPause : onPlay}
+              onClick={() => {
+                onMusicChange?.(state === 'paused' ? 'playing' : 'paused');
+              }}
             >
               <motion.div
                 initial={{ scale: 0 }}
@@ -198,7 +153,7 @@ export function MusicPlayer({ currentMusic, isPlaying, onEnd, onPlay, onPause, o
                 exit={{ scale: 0 }}
                 transition={{ duration: 0.5, ease: cubicBezier(0.34, 1.56, 0.64, 1) }}
               >
-                {isPlaying ? <IconPause width={40} height={40} /> : <IconPlay width={40} height={40} />}
+                {state === 'paused' ? <IconPlay width={40} height={40} /> : <IconPause width={40} height={40} />}
               </motion.div>
             </motion.div>
           </AnimatePresence>
@@ -269,37 +224,6 @@ const artistCss = css({
   fontSize: '17px',
   color: 'rgba(255, 255, 255, 0.6)',
 });
-
-const thumbnailWrapperCss = css({
-  flexShrink: 0,
-  width: '65px',
-  height: '65px',
-  perspective: '260px',
-});
-
-const thumbnailCss = css({
-  position: 'relative',
-  width: '100%',
-  height: '100%',
-  transformStyle: 'preserve-3d',
-});
-
-const thumbnailFrontCss = css({
-  width: '100%',
-  height: '100%',
-  backgroundColor: 'rgba(255, 255, 255, 0.6)',
-  backfaceVisibility: 'hidden',
-});
-
-const thumbnailBackCss = css(
-  {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    transform: 'rotateY(180deg) scaleX(-1)',
-  },
-  thumbnailFrontCss
-);
 
 const timeWrapperCss = css({
   position: 'relative',
