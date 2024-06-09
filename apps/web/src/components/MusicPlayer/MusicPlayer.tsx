@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 import { IconPause, IconAirplay, IconPlay } from '../../assets/index';
 import { Bar } from './Bar';
 import { Equalizer } from './Equalizer';
-import { musicList } from './const';
+import { MusicInfo } from './types';
 
 function formatTime(time: number) {
   const minutes = Math.floor(time / 60);
@@ -15,22 +15,29 @@ function formatTime(time: number) {
   return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
 }
 
-export function MusicPlayer() {
-  const [currentMusicIndex, setCurrentMusicIndex] = useState(0);
+type MusicPlayerProps = {
+  currentMusic: MusicInfo;
+  isPlaying: boolean;
+  onEnd?: () => void;
+  onPlay?: () => void;
+  onPause?: () => void;
+  onPrev?: () => void;
+  onNext?: () => void;
+};
+
+export function MusicPlayer({ currentMusic, isPlaying, onEnd, onPlay, onPause, onPrev, onNext }: MusicPlayerProps) {
   const [time, setTime] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [scopeThumbnail, animateThumbnail] = useAnimate();
   const thumbnailPath = getSvgPath({ width: 60, height: 60, cornerRadius: 16, cornerSmoothing: 0.6 });
   const timeoutId = useRef<number>(0);
   const [prevArrowList, setPrevArrowList] = useState([1, 2, 3]);
   const [nextArrowList, setNextArrowList] = useState([1, 2, 3]);
 
-  const currentMusic = musicList[currentMusicIndex];
-
   const handleProgress = (timeout: number) => {
     setTime(prevTime => {
       const nextTime = prevTime + timeout / 1000;
       if (nextTime >= currentMusic.playTime) {
+        onEnd?.();
         handleNextMusic();
         return 0;
       }
@@ -40,8 +47,7 @@ export function MusicPlayer() {
   };
 
   const handleNextMusic = () => {
-    setCurrentMusicIndex((currentMusicIndex + 1) % musicList.length);
-    setIsPlaying(true);
+    onNext();
     setTime(0);
     animateThumbnail(
       [scopeThumbnail.current, scopeThumbnail.current.firstChild],
@@ -50,17 +56,12 @@ export function MusicPlayer() {
         duration: 2,
         times: [0, 0.25, 1],
         ease: ['linear', cubicBezier(0.5, 1.5, 0.5, 1)],
-        // onUpdate: (values: number) => {
-        //   console.log(Math.abs(values) / 180);
-        //   scopeThumbnail.current.style.WebkitMaskImage = `linear-gradient(90deg, rgba(0,0,0,${Math.abs(values) / 180}) 50%, transparent 100%)`;
-        // },
       }
     );
   };
 
   const handlePrevMusic = () => {
-    setCurrentMusicIndex((currentMusicIndex - 1 + musicList.length) % musicList.length);
-    setIsPlaying(true);
+    onPrev();
     setTime(0);
     animateThumbnail(
       [scopeThumbnail.current, scopeThumbnail.current.firstChild],
@@ -87,7 +88,7 @@ export function MusicPlayer() {
   }, [isPlaying]);
 
   useEffect(() => {
-    setIsPlaying(true);
+    onPlay();
 
     return () => {
       clearTimeout(timeoutId.current);
@@ -145,18 +146,16 @@ export function MusicPlayer() {
 
         <div css={playerWrapperCss}>
           <motion.div
-            whileTap={{ scale: 0.8, backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+            whileTap={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
             css={playerIconAreaCss}
             onClick={() => {
               handlePrevMusic();
-              timeoutId.current = setTimeout(() => {
-                setPrevArrowList(prev => {
-                  const temp = [...prev];
-                  const first = temp.shift();
-                  temp.push(first!);
-                  return temp;
-                });
-              }, 200);
+              setPrevArrowList(prev => {
+                const temp = [...prev];
+                const first = temp.shift();
+                temp.push(first!);
+                return temp;
+              });
             }}
           >
             <AnimatePresence mode="popLayout">
@@ -191,7 +190,7 @@ export function MusicPlayer() {
               transition={{ delay: 0.08 }}
               whileTap={{ scale: 0.8, backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
               css={playerIconAreaCss}
-              onClick={() => setIsPlaying(prev => !prev)}
+              onClick={isPlaying ? onPause : onPlay}
             >
               <motion.div
                 initial={{ scale: 0 }}
@@ -205,18 +204,16 @@ export function MusicPlayer() {
           </AnimatePresence>
 
           <motion.div
-            whileTap={{ scale: 0.8, backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+            whileTap={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
             css={playerIconAreaCss}
             onClick={() => {
               handleNextMusic();
-              timeoutId.current = setTimeout(() => {
-                setNextArrowList(prev => {
-                  const temp = [...prev];
-                  const last = temp.pop();
-                  temp.unshift(last!);
-                  return temp;
-                });
-              }, 200);
+              setNextArrowList(prev => {
+                const temp = [...prev];
+                const last = temp.pop();
+                temp.unshift(last!);
+                return temp;
+              });
             }}
           >
             <AnimatePresence mode="popLayout">
@@ -254,6 +251,7 @@ const musicPlayerCss = css({
   width: '100%',
   height: '100%',
   padding: '24px',
+  userSelect: 'none',
 });
 
 const musicInfoCss = css({

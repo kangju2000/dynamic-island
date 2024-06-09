@@ -5,7 +5,6 @@ import { squircleVariant, type DynamicIslandVariant } from '..';
 import { CompactIsland } from './compound/CompactIsland';
 import { CustomIsland } from './compound/CustomIsland';
 import { ExpandedIsland } from './compound/ExpandedIsland';
-// import { MinimalIsland } from './compound/MinimalIsland';
 import { Notch } from './compound/Notch';
 
 export type DynamicIslandProps = {
