@@ -7,10 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      turbo:
-        specifier: ^2.0.3
-        version: 2.0.3
     devDependencies:
       '@changesets/cli':
         specifier: ^2.27.5
@@ -18,6 +14,9 @@ importers:
       prettier:
         specifier: ^3.2.5
         version: 3.2.5
+      turbo:
+        specifier: ^2.0.3
+        version: 2.0.3
 
   apps/web:
     dependencies:
