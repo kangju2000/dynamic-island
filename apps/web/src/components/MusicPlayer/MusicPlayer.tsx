@@ -131,7 +131,7 @@ export function MusicPlayer({ music, state, time, onTimeChange, onMusicChange }:
 
           <AnimatePresence mode="popLayout">
             <motion.div
-              key={state}
+              key={String(state === 'paused')}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
