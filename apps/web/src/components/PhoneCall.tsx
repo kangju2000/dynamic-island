@@ -25,7 +25,7 @@ export function PhoneCall() {
 
   return (
     <DynamicIsland.Custom
-      squircle={{ width: 366, height: 82, cornerRadius: 50, cornerSmoothing: 0 }}
+      variantStyle={{ width: 366, height: 82, borderRadius: 50 }}
       drag
       dragElastic={0.5}
       dragMomentum={false}

@@ -1,7 +1,8 @@
 import { css } from '@emotion/react';
 import { AnimatePresence } from 'framer-motion';
 import { Fragment } from 'react';
-import { squircleVariant, type DynamicIslandVariant } from '..';
+import { type DynamicIslandVariant } from '..';
+import { variantStyleMap } from '../constant';
 import { CompactIsland } from './compound/CompactIsland';
 import { CustomIsland } from './compound/CustomIsland';
 import { ExpandedIsland } from './compound/ExpandedIsland';
@@ -60,7 +61,7 @@ function Root({
       <AnimatePresence mode="wait">
         <Fragment key={variant}>{render}</Fragment>
       </AnimatePresence>
-      {!fixed && variant === 'default' && <div style={{ height: squircleVariant.default.height }} />}
+      {!fixed && variant === 'default' && <div style={{ height: variantStyleMap.default.height }} />}
     </div>
   );
 }

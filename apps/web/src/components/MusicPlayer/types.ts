@@ -6,4 +6,4 @@ export type MusicInfo = {
   playTime: number;
 };
 
-export type MusicState = 'playing' | 'paused' | 'next' | 'previous';
+export type MusicStatus = 'playing' | 'paused' | 'next' | 'previous';

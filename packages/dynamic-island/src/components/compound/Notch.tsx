@@ -2,7 +2,7 @@ import { css } from '@emotion/react';
 import { HTMLMotionProps } from 'framer-motion';
 import { motion } from 'framer-motion';
 import { forwardRef } from 'react';
-import { squircleVariant, variantPathMap } from '../../constant';
+import { variantStyleMap } from '../../constant';
 
 type NotchProps = HTMLMotionProps<'div'>;
 
@@ -14,9 +14,7 @@ export const Notch = forwardRef<HTMLDivElement, NotchProps>(function Notch(props
       ref={ref}
       css={notchCss}
       style={{
-        width: squircleVariant.default.width,
-        height: squircleVariant.default.height,
-        clipPath: variantPathMap.default,
+        ...variantStyleMap.default,
         ...style,
       }}
       {...restProps}

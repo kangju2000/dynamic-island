@@ -2,11 +2,11 @@ import { css } from '@emotion/react';
 import { DynamicIsland } from '@kangju2000/dynamic-island';
 import { Equalizer } from './Equalizer';
 import { Thumbnail } from './Thumbnail';
-import { MusicInfo, MusicState } from './types';
+import { MusicInfo, MusicStatus } from './types';
 
 type CompactMusicPlayerProps = {
   music: MusicInfo;
-  state: MusicState;
+  state: MusicStatus;
 };
 
 export function CompactMusicPlayer({ music, state }: CompactMusicPlayerProps) {
@@ -14,11 +14,7 @@ export function CompactMusicPlayer({ music, state }: CompactMusicPlayerProps) {
     <DynamicIsland.Compact
       leading={
         <div css={leadingWrapperCss}>
-          <Thumbnail
-            squircle={{ width: 26, height: 26, cornerRadius: 6, cornerSmoothing: 0.6 }}
-            music={music}
-            state={state}
-          />
+          <Thumbnail music={music} status={state} style={{ width: 26, height: 26, borderRadius: 6 }} />
         </div>
       }
       trailing={

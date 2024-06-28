@@ -1,20 +1,16 @@
 import { css } from '@emotion/react';
-import { Squircle } from '@kangju2000/dynamic-island';
-import { getSvgPath } from 'figma-squircle';
-import { cubicBezier, motion, useAnimate } from 'framer-motion';
+import { HTMLMotionProps, cubicBezier, motion, useAnimate } from 'framer-motion';
 import { useEffect, useRef } from 'react';
 import { usePrevious } from '../../hooks/usePrevious';
-import { MusicInfo, MusicState } from './types';
+import { MusicInfo, MusicStatus } from './types';
 
 type ThumbnailProps = {
   music: MusicInfo;
-  state: MusicState;
-  squircle?: Squircle;
-};
+  status: MusicStatus;
+} & HTMLMotionProps<'div'>;
 
-export function Thumbnail({ music, state, squircle }: ThumbnailProps) {
+export function Thumbnail({ music, status, ...props }: ThumbnailProps) {
   const [scopeThumbnail, animateThumbnail] = useAnimate();
-  const thumbnailPath = getSvgPath(squircle);
   const initialRender = useRef(true);
 
   const prevMusicId = usePrevious(music.id);
@@ -27,8 +23,8 @@ export function Thumbnail({ music, state, squircle }: ThumbnailProps) {
 
     if (prevMusicId !== music.id) {
       animateThumbnail(
-        [scopeThumbnail.current, scopeThumbnail.current.firstChild],
-        { rotateY: [0, state === 'next' ? -180 : 180, 0] },
+        [scopeThumbnail.current, scopeThumbnail.current.children[0]],
+        { rotateY: [0, status === 'next' ? -180 : 180, 0] },
         {
           duration: 2,
           times: [0, 0.25, 1],
@@ -40,23 +36,28 @@ export function Thumbnail({ music, state, squircle }: ThumbnailProps) {
 
   return (
     <motion.div
+      {...props}
       ref={scopeThumbnail}
       animate={{
-        scale: state === 'paused' ? 0.9 : 1,
-        filter: `opacity(${state === 'paused' ? 0.6 : 1})`,
+        scale: status === 'paused' ? 0.9 : 1,
+        filter: `opacity(${status === 'paused' ? 0.6 : 1})`,
         transition: { duration: 0.35 },
       }}
-      style={{ width: `${squircle.width + 5}px`, height: `${squircle.height + 5}px` }}
       css={thumbnailWrapperCss}
     >
-      <div
+      <motion.div
+        {...props}
+        ref={scopeThumbnail}
+        animate={{
+          scale: status === 'paused' ? 0.9 : 1,
+          filter: `opacity(${status === 'paused' ? 0.6 : 1})`,
+          transition: { duration: 0.35 },
+        }}
         css={thumbnailCss}
         className="thumbnail"
-        style={{ width: `${squircle.width}px`, height: `${squircle.height}px` }}
       >
-        <img src={music.thumbnail} css={thumbnailFrontCss} style={{ clipPath: `path("${thumbnailPath}")` }} />
-        <img src={music.thumbnail} css={thumbnailBackCss} style={{ clipPath: `path("${thumbnailPath}")` }} />
-      </div>
+        <img src={music.thumbnail} css={thumbnailFrontCss} />
+      </motion.div>
     </motion.div>
   );
 }
@@ -67,6 +68,7 @@ const thumbnailWrapperCss = css({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
+  overflow: 'hidden',
 });
 
 const thumbnailCss = css({
@@ -79,16 +81,6 @@ const thumbnailCss = css({
 const thumbnailFrontCss = css({
   width: '100%',
   height: '100%',
+  borderRadius: 'inherit',
   backgroundColor: 'rgba(255, 255, 255, 0.6)',
-  backfaceVisibility: 'hidden',
 });
-
-const thumbnailBackCss = css(
-  {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    transform: 'rotateY(180deg) scaleX(-1)',
-  },
-  thumbnailFrontCss
-);

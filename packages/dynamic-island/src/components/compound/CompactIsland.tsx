@@ -1,7 +1,6 @@
 import { css } from '@emotion/react';
-import { getSvgPath } from 'figma-squircle';
 import { motion } from 'framer-motion';
-import { squircleVariant } from '../../constant';
+import { variantStyleMap } from '../../constant';
 
 type CompactIslandProps = {
   leading?: React.ReactNode;
@@ -11,21 +10,9 @@ type CompactIslandProps = {
 export function CompactIsland({ leading, trailing }: CompactIslandProps) {
   return (
     <motion.div
-      initial={{
-        width: squircleVariant.default.width,
-        height: squircleVariant.default.height,
-        clipPath: `path("${getSvgPath(squircleVariant.default)}")`,
-      }}
-      animate={{
-        width: squircleVariant.compact.width,
-        height: squircleVariant.compact.height,
-        clipPath: `path("${getSvgPath(squircleVariant.compact)}")`,
-      }}
-      exit={{
-        width: squircleVariant.default.width,
-        height: squircleVariant.default.height,
-        clipPath: `path("${getSvgPath(squircleVariant.default)}")`,
-      }}
+      initial={variantStyleMap.default}
+      animate={variantStyleMap.compact}
+      exit={variantStyleMap.default}
       css={compactIslandCss}
     >
       <motion.div

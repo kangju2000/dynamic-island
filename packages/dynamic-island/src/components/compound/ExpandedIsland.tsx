@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 import { HTMLMotionProps, motion, useWillChange } from 'framer-motion';
-import { squircleVariant, variantPathMap } from '../../constant';
+import { variantStyleMap } from '../../constant';
 
 type ExpandIslandProps = {
   children: React.ReactNode;
@@ -11,27 +11,14 @@ export function ExpandedIsland({ children, ...props }: ExpandIslandProps) {
 
   return (
     <motion.div
-      initial={{
-        width: squircleVariant.default.width,
-        height: squircleVariant.default.height,
-        clipPath: variantPathMap.default,
-      }}
+      initial={variantStyleMap.default}
       animate={{
-        width: squircleVariant.expanded.width,
-        height: squircleVariant.expanded.height,
-        clipPath: variantPathMap.expanded,
+        ...variantStyleMap.expanded,
+        transition: { type: 'spring', stiffness: 100, damping: 12, mass: 0.5 },
       }}
       exit={{
-        width: squircleVariant.default.width,
-        height: squircleVariant.default.height,
-        clipPath: variantPathMap.default,
+        ...variantStyleMap.default,
         transition: { type: 'spring', stiffness: 150, damping: 18, mass: 0.5 },
-      }}
-      transition={{
-        type: 'spring',
-        stiffness: 100,
-        damping: 12,
-        mass: 0.5,
       }}
       css={expandedIslandCss}
       style={{ willChange }}
@@ -46,5 +33,4 @@ const expandedIslandCss = css({
   position: 'relative',
   backgroundColor: '#000',
   overflow: 'hidden',
-  borderRadius: '32px',
 });

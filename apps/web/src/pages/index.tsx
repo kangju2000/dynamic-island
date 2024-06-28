@@ -3,13 +3,13 @@ import { DynamicIsland, DynamicIslandMode } from '@kangju2000/dynamic-island';
 import { useState } from 'react';
 import { CompactMusicPlayer, MusicPlayer } from '../components/MusicPlayer';
 import { musicList } from '../components/MusicPlayer/const';
-import { MusicState } from '../components/MusicPlayer/types';
+import { MusicStatus } from '../components/MusicPlayer/types';
 import { PhoneCall } from '../components/PhoneCall';
 
 export function Home() {
   const [mode, setMode] = useState<DynamicIslandMode>(DynamicIslandMode.default);
   const [musicIndex, setMusicIndex] = useState(0);
-  const [musicState, setMusicState] = useState<MusicState>('paused');
+  const [musicStatus, setMusicStatus] = useState<MusicStatus>('paused');
   const [time, setTime] = useState(0);
 
   return (
@@ -19,11 +19,11 @@ export function Home() {
         expanded={
           <MusicPlayer
             music={musicList[musicIndex]}
-            state={musicState}
+            status={musicStatus}
             time={time}
             onTimeChange={setTime}
             onMusicChange={state => {
-              setMusicState(state);
+              setMusicStatus(state);
 
               if (state === 'next') {
                 setMusicIndex((musicIndex + 1) % musicList.length);
@@ -33,13 +33,13 @@ export function Home() {
             }}
           />
         }
-        compact={<CompactMusicPlayer music={musicList[musicIndex]} state={musicState} />}
+        compact={<CompactMusicPlayer music={musicList[musicIndex]} state={musicStatus} />}
         custom={<PhoneCall />}
       />
 
       <h1>Dynamic Island</h1>
 
-      <div style={{ display: 'flex', gap: '20px', textAlign: 'center' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
         <Button onClick={() => setMode(DynamicIslandMode.default)} isActive={mode === DynamicIslandMode.default}>
           Default
         </Button>

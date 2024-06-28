@@ -7,18 +7,18 @@ import { IconPause, IconAirplay, IconPlay } from '../../assets/index';
 import { Bar } from './Bar';
 import { Equalizer } from './Equalizer';
 import { Thumbnail } from './Thumbnail';
-import { MusicInfo, MusicState } from './types';
+import { MusicInfo, MusicStatus } from './types';
 import { formatTime } from './utils';
 
 type MusicPlayerProps = {
   music: MusicInfo;
-  state: MusicState;
+  status: MusicStatus;
   time: number;
   onTimeChange: Dispatch<SetStateAction<number>>;
-  onMusicChange?: (state: MusicState) => void;
+  onMusicChange?: (state: MusicStatus) => void;
 };
 
-export function MusicPlayer({ music, state, time, onTimeChange, onMusicChange }: MusicPlayerProps) {
+export function MusicPlayer({ music, status, time, onTimeChange, onMusicChange }: MusicPlayerProps) {
   const timeoutId = useRef<number>(0);
   const [prevArrowList, setPrevArrowList] = useState([1, 2, 3]);
   const [nextArrowList, setNextArrowList] = useState([1, 2, 3]);
@@ -34,22 +34,33 @@ export function MusicPlayer({ music, state, time, onTimeChange, onMusicChange }:
   };
 
   useEffect(() => {
-    if (state === 'paused') {
+    if (status === 'paused') {
       return;
     }
 
     const timeout = 100;
     const interval = setInterval(() => {
-      onTimeChange(prev => prev + timeout / 1000);
+      onTimeChange(prev => {
+        const nextTime = prev + timeout / 1000;
+
+        if (nextTime >= music.playTime) {
+          handleNextMusic();
+          clearInterval(interval);
+
+          return 0;
+        }
+
+        return nextTime;
+      });
     }, timeout);
 
     return () => {
       clearInterval(interval);
     };
-  }, [state]);
+  }, [status]);
 
   useEffect(() => {
-    if (state === 'playing') {
+    if (status === 'playing') {
       return;
     }
 
@@ -69,16 +80,12 @@ export function MusicPlayer({ music, state, time, onTimeChange, onMusicChange }:
         css={musicPlayerCss}
       >
         <div css={musicInfoCss}>
-          <Thumbnail
-            squircle={{ width: 60, height: 60, cornerRadius: 16, cornerSmoothing: 0.6 }}
-            music={music}
-            state={state}
-          />
+          <Thumbnail music={music} status={status} style={{ width: '60px', height: '60px', borderRadius: '16px' }} />
           <div style={{ flex: 1, whiteSpace: 'nowrap' }}>
             <p css={titleCss}>{music.title}</p>
             <p css={artistCss}>{music.artist}</p>
           </div>
-          <Equalizer music={music} isPlaying={state !== 'paused'} />
+          <Equalizer music={music} isPlaying={status !== 'paused'} />
         </div>
 
         <div style={{ flexShrink: 0, height: '16px' }} />
@@ -131,7 +138,7 @@ export function MusicPlayer({ music, state, time, onTimeChange, onMusicChange }:
 
           <AnimatePresence mode="popLayout">
             <motion.div
-              key={String(state === 'paused')}
+              key={String(status === 'paused')}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -139,7 +146,7 @@ export function MusicPlayer({ music, state, time, onTimeChange, onMusicChange }:
               whileTap={{ scale: 0.8, backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
               css={playerIconAreaCss}
               onClick={() => {
-                onMusicChange?.(state === 'paused' ? 'playing' : 'paused');
+                onMusicChange?.(status === 'paused' ? 'playing' : 'paused');
               }}
             >
               <motion.div
@@ -148,7 +155,7 @@ export function MusicPlayer({ music, state, time, onTimeChange, onMusicChange }:
                 exit={{ scale: 0 }}
                 transition={{ duration: 0.5, ease: cubicBezier(0.34, 1.56, 0.64, 1) }}
               >
-                {state === 'paused' ? <IconPlay width={40} height={40} /> : <IconPause width={40} height={40} />}
+                {status === 'paused' ? <IconPlay width={40} height={40} /> : <IconPause width={40} height={40} />}
               </motion.div>
             </motion.div>
           </AnimatePresence>

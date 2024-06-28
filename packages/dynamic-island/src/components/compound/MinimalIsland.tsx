@@ -1,7 +1,6 @@
 import { css } from '@emotion/react';
-import { getSvgPath } from 'figma-squircle';
 import { motion } from 'framer-motion';
-import { squircleVariant } from '../../constant';
+import { variantStyleMap } from '../../constant';
 
 type MinimalIslandProps = {
   children: React.ReactNode;
@@ -106,10 +105,8 @@ function SplitEffect() {
           style={{
             transform: 'translateX(50%)',
             transformOrigin: 'center',
-            width: squircleVariant.minimal.width,
-            height: squircleVariant.minimal.height,
+            ...variantStyleMap.minimal,
             backgroundColor: '#000',
-            clipPath: `path("${getSvgPath(squircleVariant.minimal)}")`,
             overflow: 'hidden',
           }}
 

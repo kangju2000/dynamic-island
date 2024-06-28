@@ -8,10 +8,8 @@ export enum DynamicIslandMode {
   'custom' = 'custom',
 }
 
-export type Squircle = {
+export type VariantStyle = {
   width: number;
   height: number;
-  cornerRadius: number;
-  cornerSmoothing: number;
-  preserveSmoothing?: boolean;
+  borderRadius: number;
 };
